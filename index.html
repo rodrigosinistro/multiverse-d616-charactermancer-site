@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Multiverse D616 — Charactermancer</title>
+  <link rel="stylesheet" href="styles/app.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand__title">Multiverse D616 — Charactermancer</div>
+      <div class="brand__subtitle">Site estático (GitHub Pages) • Preencha e gere PDF via impressão</div>
+    </div>
+    <div class="topbar__actions">
+      <button id="btnImport" class="btn">Importar JSON</button>
+      <button id="btnExport" class="btn">Exportar JSON</button>
+      <button id="btnPrint" class="btn btn--primary">Gerar PDF (Imprimir)</button>
+      <input id="fileImport" type="file" accept="application/json" hidden />
+    </div>
+  </header>
+
+  <main class="layout">
+    <nav class="sidebar">
+      <div class="sidebar__title">Etapas</div>
+      <ul id="steps" class="steps"></ul>
+      <div class="sidebar__footer">
+        <div class="muted">Tudo funciona offline após carregar.</div>
+        <div class="muted">Dados e template embutidos.</div>
+      </div>
+    </nav>
+
+    <section class="content">
+      <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <div>
+          <div class="loading__title">Carregando dados…</div>
+          <div class="muted">Origins, Occupations, Traits, Tags e Powers.</div>
+        </div>
+      </div>
+
+      <div id="app" class="app hidden">
+        <div class="content__header">
+          <div class="content__header-left">
+            <h1 id="stepTitle">—</h1>
+            <div id="stepHint" class="muted"></div>
+          </div>
+          <div class="content__header-right">
+            <button id="btnPrev" class="btn">◀ Anterior</button>
+            <button id="btnNext" class="btn">Próximo ▶</button>
+          </div>
+        </div>
+
+        <div id="stepBody" class="step"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span class="muted">Template: <code>assets/pdf-templates/M616 Character Sheet - Alt Red.pdf</code></span>
+  </footer>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
