@@ -1,5 +1,9 @@
 # Multiverse D616 — Charactermancer (Site)
 
+**Acesse o site:** https://rodrigosinistro.github.io/multiverse-d616-charactermancer-site/
+
+Versão atual: **v0.0.2**
+
 Este repositório é um **site estático** (pronto para **GitHub Pages**) que permite montar um personagem do **Marvel Multiverse (D616)** e **gerar um PDF** da ficha **usando o template embutido**.
 
 - ✅ Sem build / sem Node / sem dependências
@@ -29,7 +33,19 @@ python -m http.server 8080
 
 Depois acesse:
 
-- `http://localhost:8080/multiverse-d616-charactermancer-site/`
+- `http://localhost:8080/`
+
+> Dica: execute o comando dentro da pasta do repositório (onde está o `index.html`).
+
+## Resetar e começar do zero
+
+O site salva automaticamente o progresso no seu navegador (LocalStorage), então um refresh pode manter os dados.
+
+Você tem 2 formas de limpar tudo:
+
+1. Clique em **Resetar** (barra superior).
+2. Acesse a URL com `?reset=1` (ou `?clear=1`), por exemplo:
+   - `https://rodrigosinistro.github.io/multiverse-d616-charactermancer-site/?reset=1`
 
 ## Publicar no GitHub Pages
 

@@ -2,7 +2,11 @@ import { loadAllData } from './data.js';
 import { debounce, downloadText, safeJsonParse, cleanText } from './util.js';
 import { loadPdfFieldMap, buildFilledFields, renderOverlay, openPrintWindow } from './pdf.js';
 
+const APP_VERSION = '0.0.2';
 const LS_KEY = 'm616_char_site_state_v1';
+
+// Debounced persistence (set after state is initialized)
+let persist = ()=>{};
 
 const DEFAULT_STATE = {
   codename: '',
@@ -186,13 +190,13 @@ function stepBasics(state, data, rerender){
   const bind = (id, key) => {
     const input = root.querySelector(id);
     input.value = state[key] ?? '';
-    input.addEventListener('input', ()=>{ state[key] = input.value; rerender(false); });
+    input.addEventListener('input', ()=>{ state[key] = input.value; persist(); });
   };
 
   bind('#codename', 'codename');
   const rank = root.querySelector('#rank');
   rank.value = String(state.rank ?? 1);
-  rank.addEventListener('change', ()=>{ state.rank = Number(rank.value)||1; rerender(false); });
+  rank.addEventListener('change', ()=>{ state.rank = Number(rank.value)||1; persist(); });
 
   bind('#realName','realName');
   bind('#gender','gender');
@@ -236,7 +240,7 @@ function stepNumbers(state, data, rerender){
   const bind = (id, key) => {
     const input = root.querySelector(id);
     input.value = state[key] ?? '';
-    input.addEventListener('input', ()=>{ state[key] = input.value; rerender(false); });
+    input.addEventListener('input', ()=>{ state[key] = input.value; persist(); });
   };
 
   bind('#karma','karma');
@@ -277,7 +281,7 @@ function stepAbilities(state, data, rerender){
     const c = el(`<div class="card" style="box-shadow:none; background: rgba(11,13,18,.35)">
       <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
         <div style="font-weight:800">${label}</div>
-        <div class="muted">Def: ${a.defense}</div>
+        <div class="muted" data-def>Def: ${a.defense}</div>
       </div>
       <div class="grid3" style="margin-top:10px">
         <div class="field"><label>Value</label><input data-k="value" type="number" /></div>
@@ -296,7 +300,10 @@ function stepAbilities(state, data, rerender){
         // if defense blank, auto compute
         if (k === 'value') a.defense = abilityDefense(a.value);
         state.abilities[key] = normalizeAbility(a);
-        rerender(false);
+        // Update the small header display without re-rendering the whole step.
+        const defEl = c.querySelector('[data-def]');
+        if (defEl) defEl.textContent = `Def: ${state.abilities[key].defense}`;
+        persist();
       });
     }
 
@@ -366,14 +373,14 @@ function stepOccupationOrigin(state, data, rerender){
     const occ = data.occupations.find(o=>o.id===state.occupationId);
     state.occupationName = occ?.name || '';
     refreshDescs();
-    rerender(false);
+    persist();
   });
   oriSel.addEventListener('change', ()=>{
     state.originId = oriSel.value;
     const ori = data.origins.find(o=>o.id===state.originId);
     state.originName = ori?.name || '';
     refreshDescs();
-    rerender(false);
+    persist();
   });
 
   // prefill names
@@ -391,7 +398,7 @@ function stepOccupationOrigin(state, data, rerender){
   const bind = (id, key) => {
     const input = root.querySelector(id);
     input.value = state[key] ?? '';
-    input.addEventListener('input', ()=>{ state[key] = input.value; rerender(false); });
+    input.addEventListener('input', ()=>{ state[key] = input.value; persist(); });
   };
 
   bind('#teams','teams');
@@ -518,6 +525,19 @@ const STEPS = [
 ];
 
 let state = loadState();
+
+// Optional: open the site with ?reset=1 (or ?clear=1) to start from scratch.
+try{
+  const params = new URLSearchParams(location.search);
+  if (params.has('reset') || params.has('clear')){
+    localStorage.removeItem(LS_KEY);
+    state = structuredClone(DEFAULT_STATE);
+    // remove query string so refresh won't keep resetting
+    history.replaceState({}, document.title, location.pathname);
+  }
+}catch{}
+
+persist = debounce(()=>saveState(state), 250);
 let data = null;
 let fieldMap = null;
 let stepIndex = 0;
@@ -534,6 +554,7 @@ const els = {
   btnPrint: document.getElementById('btnPrint'),
   btnExport: document.getElementById('btnExport'),
   btnImport: document.getElementById('btnImport'),
+  btnReset: document.getElementById('btnReset'),
   fileImport: document.getElementById('fileImport'),
 };
 
@@ -618,6 +639,14 @@ els.btnNext.addEventListener('click', ()=>{ if (stepIndex<STEPS.length-1){ stepI
 els.btnPrint.addEventListener('click', doPrint);
 els.btnExport.addEventListener('click', exportJson);
 els.btnImport.addEventListener('click', ()=>els.fileImport.click());
+els.btnReset?.addEventListener('click', ()=>{
+  const ok = confirm('Apagar os dados salvos neste navegador e recomeçar do zero?');
+  if (!ok) return;
+  localStorage.removeItem(LS_KEY);
+  state = structuredClone(DEFAULT_STATE);
+  stepIndex = 0;
+  render(true);
+});
 els.fileImport.addEventListener('change', ()=>{
   const f = els.fileImport.files?.[0];
   if (f) importJsonFile(f);

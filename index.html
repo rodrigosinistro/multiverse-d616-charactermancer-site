@@ -3,16 +3,17 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Multiverse D616 — Charactermancer</title>
+  <title>Multiverse D616 — Charactermancer (v0.0.2)</title>
   <link rel="stylesheet" href="styles/app.css" />
 </head>
 <body>
   <header class="topbar">
     <div class="brand">
-      <div class="brand__title">Multiverse D616 — Charactermancer</div>
+      <div class="brand__title">Multiverse D616 — Charactermancer <span class="muted" style="font-weight:650">v0.0.2</span></div>
       <div class="brand__subtitle">Site estático (GitHub Pages) • Preencha e gere PDF via impressão</div>
     </div>
     <div class="topbar__actions">
+      <button id="btnReset" class="btn btn--danger" title="Apagar dados locais e recomeçar">Resetar</button>
       <button id="btnImport" class="btn">Importar JSON</button>
       <button id="btnExport" class="btn">Exportar JSON</button>
       <button id="btnPrint" class="btn btn--primary">Gerar PDF (Imprimir)</button>

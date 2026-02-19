@@ -100,6 +100,12 @@ code{ font-family:var(--mono); }
 }
 .btn--primary:hover{ filter:brightness(1.05); }
 
+.btn--danger{
+  background: linear-gradient(180deg, #3a1b24 0%, #2b131a 100%);
+  border-color: rgba(255,45,85,.35);
+}
+.btn--danger:hover{ border-color: rgba(255,45,85,.6); }
+
 .muted{ color: var(--muted); font-size:12px; }
 .hidden{ display:none !important; }
 
