@@ -1,0 +1,25 @@
+{
+  "MMC": {
+    "Open": "Abrir Charactermancer",
+    "Next": "Seguinte",
+    "Back": "Voltar",
+    "Apply": "Aplicar no Ator",
+    "Cancel": "Cancelar",
+    "Rank": "Rank",
+    "Abilities": "Atributos",
+    "Occupation": "Ocupação",
+    "Origin": "Origem",
+    "TraitsTags": "Traços & Tags",
+    "Powers": "Poderes",
+    "Review": "Revisão",
+    "Points": "Pontos",
+    "Max": "Máx.",
+    "Select": "Selecionar",
+    "Selected": "Selecionado",
+    "Remove": "Remover",
+    "BasicPowers": "Poderes Básicos",
+    "PowerSet": "Power Set",
+    "Search": "Buscar...",
+    "attrCapWarn": "Você atingiu o limite de atributo para este Rank."
+  }
+}

@@ -1,75 +1,37 @@
 # Multiverse D616 — Charactermancer (Site)
 
-**Acesse o site:** https://rodrigosinistro.github.io/multiverse-d616-charactermancer-site/
+Charactermancer web (estático) para o **Multiverse D616**: você monta o personagem com a mesma lógica/fluxo do charactermancer do Foundry e, ao final, **baixa o PDF (M616)**.
 
-Versão atual: **v0.0.2**
-
-Este repositório é um **site estático** (pronto para **GitHub Pages**) que permite montar um personagem do **Marvel Multiverse (D616)** e **gerar um PDF** da ficha **usando o template embutido**.
-
-- ✅ Sem build / sem Node / sem dependências
-- ✅ Funciona em **GitHub Pages** e também localmente
-- ✅ Dados (Origins, Occupations, Traits, Tags, Powers) **embutidos em JSON** dentro do repositório
-- ✅ Template do PDF embutido: `assets/pdf-templates/M616 Character Sheet - Alt Red.pdf`
+- **Site (GitHub Pages):** abra o repositório publicado e acesse pela URL do Pages.
+- **Exportação de PDF:** usa **pdf-lib** e **FileSaver** via **CDN** (carregamento sob demanda).
+- **Templates do PDF:** ficam embutidos em `assets/templates/`.
 
 ## Como usar
 
-1. Abra o site.
-2. Preencha as etapas (Identidade, Valores, Abilities, Occupation/Origin, Traits, Tags, Powers).
-3. Clique em **Gerar PDF (Imprimir)**.
-4. Na janela que abrir, use **Imprimir → Salvar como PDF**.
+1. Escolha **Rank** e distribua os **atributos (M.A.R.V.E.L.)**.
+2. Selecione **Ocupação** e **Origem**.
+3. Escolha **Traços** e **Tags**.
+4. Selecione **Poderes** (respeitando pré-requisitos e limite do Rank).
+5. Em **Revisão**, preencha a **Biografia** e clique em **Baixar PDF (M616)**.
 
-> **Observação importante**
->
-> O “PDF gerado” é feito via **página de impressão** (imagem do template + texto posicionado por coordenadas). Isso funciona muito bem para gerar um PDF final, mas não edita o formulário interno do PDF.
+## Exportação / Importação
 
-## Rodar localmente
+Na etapa **Revisão**:
+- **Baixar JSON**: salva seu progresso.
+- **Importar JSON**: restaura seu progresso.
+- **Resetar Tudo**: volta ao estado inicial.
 
-Por segurança, alguns navegadores bloqueiam `fetch()` quando você abre `index.html` direto do disco. Use um servidor simples:
+## Estrutura
 
-```bash
-# Python 3
-python -m http.server 8080
-```
+- `index.html` — página do app
+- `styles/` — CSS do charactermancer
+- `data/` — JSONs (ocupações, origens, traços, tags, poderes, modelo de ator)
+- `assets/templates/` — PDFs-base (cores)
+- `js/mmc-site.js` — lógica do charactermancer (web port)
+- `js/m616-export.js` — exportação de PDF (web port)
 
-Depois acesse:
+## Observações
 
-- `http://localhost:8080/`
+- Este projeto é um **site estático**: não precisa de build.
+- Para publicar no GitHub Pages, basta habilitar Pages apontando para a branch/pasta raiz.
 
-> Dica: execute o comando dentro da pasta do repositório (onde está o `index.html`).
-
-## Resetar e começar do zero
-
-O site salva automaticamente o progresso no seu navegador (LocalStorage), então um refresh pode manter os dados.
-
-Você tem 2 formas de limpar tudo:
-
-1. Clique em **Resetar** (barra superior).
-2. Acesse a URL com `?reset=1` (ou `?clear=1`), por exemplo:
-   - `https://rodrigosinistro.github.io/multiverse-d616-charactermancer-site/?reset=1`
-
-## Publicar no GitHub Pages
-
-1. Suba este repositório para o GitHub.
-2. Vá em **Settings → Pages**.
-3. Em **Build and deployment**, selecione:
-   - **Source:** Deploy from a branch
-   - **Branch:** `main` / `/ (root)`
-
-## Arquivos importantes
-
-- `index.html` — entrada do site
-- `js/app.js` — lógica do charactermancer
-- `assets/template.png` — render da ficha (base para impressão)
-- `assets/pdf-field-map.json` — mapa de campos (coordenadas)
-- `assets/pdf-templates/` — templates PDF embutidos
-- `data/` — dados de Origins/Occupations/Traits/Tags/Powers
-
-## Dados e template
-
-Os dados foram trazidos do seu repositório do charactermancer (packs exportados em JSON) e ficam em `data/`.
-
-O template da ficha foi incluído neste repo (o arquivo é público e foi fornecido por você).
-
-## Licença
-
-MIT — veja `LICENSE`.

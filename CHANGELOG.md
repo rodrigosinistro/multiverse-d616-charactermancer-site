@@ -1,16 +1,13 @@
 # Changelog
 
+## v0.0.3
+
+- Ajuste do fluxo final para **Baixar PDF (M616)** no último passo.
+- Adicionados botões de **Baixar/Importar JSON** e **Resetar Tudo** na etapa de Revisão.
+- Exportação de PDF via **CDN** (pdf-lib + FileSaver) e templates embutidos em `assets/templates/`.
+- Sem persistência automática: ao **dar refresh**, o site volta do zero (use JSON se quiser salvar).
+
 ## v0.0.2
 
-- **Fix:** campos de texto (Identidade e outros) agora aceitam digitação normal (antes o re-render por tecla derrubava o foco e parecia “1 letra só”).
-- **Novo:** botão **Resetar** no topo para apagar dados locais e recomeçar.
-- **Novo:** suporte a `?reset=1` / `?clear=1` na URL para iniciar limpo.
-- README atualizado com o link do site e instruções de reset.
+- Primeira versão publicada do site.
 
-## v0.0.1
-
-- Primeira versão do site estático do Charactermancer (D616).
-- Dados embutidos: Origins, Occupations, Traits, Tags, Powers.
-- Template PDF embutido + render para `assets/template.png`.
-- Geração de PDF via impressão (layout por coordenadas).
-- Import/Export de personagem em JSON.

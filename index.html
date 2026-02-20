@@ -3,64 +3,49 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Multiverse D616 — Charactermancer (v0.0.2)</title>
-  <link rel="stylesheet" href="styles/app.css" />
+  <title>Multiverse D616 — Charactermancer</title>
+  <meta name="description" content="Charactermancer web (Multiverse D616) — monte personagem e baixe PDF." />
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="styles/styles.css" />
+  <link rel="stylesheet" href="styles/skin-iconic.css" />
+  <style>
+    body{margin:0;background:#111114;color:#e6e6e6;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;}
+    .page{max-width:1100px;margin:18px auto;padding:0 12px;}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;}
+    .brand{display:flex;align-items:center;gap:10px;}
+    .brand .logo{width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center;border-radius:10px;background:#1f1f23;border:1px solid #505059;}
+    .brand h1{font-size:16px;margin:0;font-weight:800;letter-spacing:.2px;}
+    .brand .sub{font-size:12px;color:#c7c7d1;}
+    .mmc-shell{border:1px solid #3b3b44;border-radius:16px;padding:12px;background:rgba(0,0,0,.12);box-shadow:0 14px 60px rgba(0,0,0,.35);}
+    .toast-wrap{position:fixed;top:12px;right:12px;display:flex;flex-direction:column;gap:10px;z-index:9999;}
+    .toast{min-width:260px;max-width:420px;padding:10px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:#1f1f23;box-shadow:0 10px 30px rgba(0,0,0,.35);}
+    .toast strong{display:block;font-size:12px;margin-bottom:4px;opacity:.9;}
+    .toast p{margin:0;font-size:13px;line-height:1.35;color:#e6e6e6;}
+  </style>
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <div class="brand__title">Multiverse D616 — Charactermancer <span class="muted" style="font-weight:650">v0.0.2</span></div>
-      <div class="brand__subtitle">Site estático (GitHub Pages) • Preencha e gere PDF via impressão</div>
-    </div>
-    <div class="topbar__actions">
-      <button id="btnReset" class="btn btn--danger" title="Apagar dados locais e recomeçar">Resetar</button>
-      <button id="btnImport" class="btn">Importar JSON</button>
-      <button id="btnExport" class="btn">Exportar JSON</button>
-      <button id="btnPrint" class="btn btn--primary">Gerar PDF (Imprimir)</button>
-      <input id="fileImport" type="file" accept="application/json" hidden />
-    </div>
-  </header>
+  <div class="toast-wrap" id="toast-wrap" aria-live="polite" aria-atomic="true"></div>
 
-  <main class="layout">
-    <nav class="sidebar">
-      <div class="sidebar__title">Etapas</div>
-      <ul id="steps" class="steps"></ul>
-      <div class="sidebar__footer">
-        <div class="muted">Tudo funciona offline após carregar.</div>
-        <div class="muted">Dados e template embutidos.</div>
-      </div>
-    </nav>
-
-    <section class="content">
-      <div id="loading" class="loading">
-        <div class="spinner"></div>
+  <div class="page">
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">🦸</div>
         <div>
-          <div class="loading__title">Carregando dados…</div>
-          <div class="muted">Origins, Occupations, Traits, Tags e Powers.</div>
+          <h1>Multiverse D616 — Charactermancer</h1>
+          <div class="sub">Monte seu personagem e baixe o PDF (M616).</div>
         </div>
       </div>
+      <div class="sub" id="version"></div>
+    </div>
 
-      <div id="app" class="app hidden">
-        <div class="content__header">
-          <div class="content__header-left">
-            <h1 id="stepTitle">—</h1>
-            <div id="stepHint" class="muted"></div>
-          </div>
-          <div class="content__header-right">
-            <button id="btnPrev" class="btn">◀ Anterior</button>
-            <button id="btnNext" class="btn">Próximo ▶</button>
-          </div>
-        </div>
+    <div class="mmc-shell mmc-app" id="mmc-root"></div>
 
-        <div id="stepBody" class="step"></div>
-      </div>
-    </section>
-  </main>
+    <div class="sub" style="margin-top:10px;opacity:.9;">
+      Dica: o PDF usa <code>pdf-lib</code> e <code>FileSaver</code> via CDN no momento.
+    </div>
+  </div>
 
-  <footer class="footer">
-    <span class="muted">Template: <code>assets/pdf-templates/M616 Character Sheet - Alt Red.pdf</code></span>
-  </footer>
-
-  <script type="module" src="js/app.js"></script>
+  <script src="js/m616-export.js"></script>
+  <script src="js/mmc-site.js"></script>
 </body>
 </html>
