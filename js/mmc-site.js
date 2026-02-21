@@ -1,12 +1,12 @@
 /* Multiverse D616 — Charactermancer Site
  * Web port based on the Foundry module: marvel-multiverse-charactermancer v0.1.3
- * Site version: v0.0.4
+ * Site version: v0.0.5
  */
 
 (function(){
   'use strict';
 
-  const SITE_VERSION = '0.0.4';
+  const SITE_VERSION = '0.0.5';
   const ROOT_ID = 'mmc-root';
 
   // ---------- Tiny "Foundry-like" stubs (to keep the original code structure) ----------
@@ -634,30 +634,40 @@
 
       return wrap;
     }
-
     _renderTraitsTags(){
       const wrap = document.createElement('div');
+      // 2x2 grid like the Foundry module: top row lists, bottom row selected panels
       wrap.className='mmc-grid';
 
-      const left = document.createElement('div'); left.className='mmc-card';
-      left.innerHTML = `<h3>Traços</h3>
+      // Top-left: Traits
+      const leftTop = document.createElement('div'); leftTop.className='mmc-card';
+      leftTop.innerHTML = `<h3>Traços</h3>
         <input class="mmc-search" placeholder="Buscar..." name="search-traits" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">`;
       const listTraits = document.createElement('div'); listTraits.className='mmc-list mmc-scroll';
-      left.appendChild(listTraits);
-      wrap.appendChild(left);
+      leftTop.appendChild(listTraits);
+      wrap.appendChild(leftTop);
 
-      const mid = document.createElement('div'); mid.className='mmc-card';
-      mid.innerHTML = `<h3>Tags</h3>
+      // Top-right: Tags
+      const rightTop = document.createElement('div'); rightTop.className='mmc-card';
+      rightTop.innerHTML = `<h3>Tags</h3>
         <input class="mmc-search" placeholder="Buscar..." name="search-tags" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">`;
       const listTags = document.createElement('div'); listTags.className='mmc-list mmc-scroll';
-      mid.appendChild(listTags);
-      wrap.appendChild(mid);
+      rightTop.appendChild(listTags);
+      wrap.appendChild(rightTop);
 
-      const right = document.createElement('div'); right.className='mmc-card';
-      right.innerHTML = `<h3>Selecionados</h3>`;
-      const selWrap = document.createElement('div'); selWrap.className='mmc-chips';
-      right.appendChild(selWrap);
-      wrap.appendChild(right);
+      // Bottom-left: Selected Traits
+      const selTraits = document.createElement('div'); selTraits.className='mmc-card mmc-selected';
+      selTraits.innerHTML = `<h3>Selecionados — Traços</h3>`;
+      const chipsTraits = document.createElement('div'); chipsTraits.className='mmc-chips';
+      selTraits.appendChild(chipsTraits);
+      wrap.appendChild(selTraits);
+
+      // Bottom-right: Selected Tags
+      const selTags = document.createElement('div'); selTags.className='mmc-card mmc-selected';
+      selTags.innerHTML = `<h3>Selecionados — Tags</h3>`;
+      const chipsTags = document.createElement('div'); chipsTags.className='mmc-chips';
+      selTags.appendChild(chipsTags);
+      wrap.appendChild(selTags);
 
       const grantedTraits = [ ...(this.state.occupation?.system?.traits||[]), ...(this.state.origin?.system?.traits||[]) ];
       const grantedTags = [ ...(this.state.occupation?.system?.tags||[]), ...(this.state.origin?.system?.tags||[]) ];
@@ -665,29 +675,38 @@
       const traits = MMCCharactermancer._mmcDedupByName([...(this.state.data.traits||[])]);
       const tags = MMCCharactermancer._mmcDedupByName([...(this.state.data.tags||[])]);
 
+      const mkChip = (label, removeFn, granted=false)=>{
+        const c = document.createElement('div');
+        c.className = granted ? 'mmc-tag mmc-tag-granted' : 'mmc-tag';
+        c.innerHTML = granted ? label : `${label} <button type="button" class="mmc-chip-x" title="Remover">×</button>`;
+        if (!granted && removeFn){
+          const b = c.querySelector('button');
+          if (b) b.addEventListener('click', (ev)=>{ ev.preventDefault(); ev.stopPropagation(); removeFn(); });
+        }
+        return c;
+      };
+
       const renderSelected = ()=>{
-        selWrap.innerHTML='';
-        const mkChip = (label, removeFn, granted=false)=>{
-          const c = document.createElement('div');
-          c.className = granted ? 'mmc-tag mmc-tag-granted' : 'mmc-tag';
-          c.innerHTML = granted ? label : `${label} <button type="button" class="mmc-chip-x" title="Remover">×</button>`;
-          if (!granted){ c.querySelector('button').addEventListener('click', removeFn); }
-          return c;
-        };
-        grantedTraits.forEach(t=>selWrap.appendChild(mkChip(`Traço: ${t.name}`, null, true)));
-        grantedTags.forEach(t=>selWrap.appendChild(mkChip(`Tag: ${t.name}`, null, true)));
-        (this.state.selectedTraits||[]).forEach(t=> selWrap.appendChild(mkChip(`Traço: ${t.name}`, ()=>{
+        chipsTraits.innerHTML='';
+        chipsTags.innerHTML='';
+
+        // Traits
+        grantedTraits.forEach(t=> chipsTraits.appendChild(mkChip(t.name, null, true)));
+        (this.state.selectedTraits||[]).forEach(t=> chipsTraits.appendChild(mkChip(t.name, ()=>{
           try{ this.state.scroll.traits = listTraits.scrollTop; }catch(_){ }
           try{ this.state.scroll.tags = listTags.scrollTop; }catch(_){ }
           this.state.selectedTraits = (this.state.selectedTraits||[]).filter(x=>x._id!==t._id);
           this._refreshPowerChips();
-        } )));
-        (this.state.selectedTags||[]).forEach(t=> selWrap.appendChild(mkChip(`Tag: ${t.name}`, ()=>{
+        })));
+
+        // Tags
+        grantedTags.forEach(t=> chipsTags.appendChild(mkChip(t.name, null, true)));
+        (this.state.selectedTags||[]).forEach(t=> chipsTags.appendChild(mkChip(t.name, ()=>{
           try{ this.state.scroll.traits = listTraits.scrollTop; }catch(_){ }
           try{ this.state.scroll.tags = listTags.scrollTop; }catch(_){ }
           this.state.selectedTags = (this.state.selectedTags||[]).filter(x=>x._id!==t._id);
           this._refreshPowerChips();
-        } )));
+        })));
       };
 
       const renderList = (kind, listEl, data, q)=>{
@@ -731,12 +750,12 @@
       this._bindScrollMemory(listTraits, 'traits');
       this._bindScrollMemory(listTags, 'tags');
 
-      left.querySelector('input[name="search-traits"]').addEventListener('input', (ev)=>{
+      leftTop.querySelector('input[name="search-traits"]').addEventListener('input', (ev)=>{
         this.state.scroll.traits = listTraits.scrollTop;
         renderList('trait', listTraits, traits, ev.target.value);
         this._restoreScroll(listTraits, 'traits');
       });
-      mid.querySelector('input[name="search-tags"]').addEventListener('input', (ev)=>{
+      rightTop.querySelector('input[name="search-tags"]').addEventListener('input', (ev)=>{
         this.state.scroll.tags = listTags.scrollTop;
         renderList('tag', listTags, tags, ev.target.value);
         this._restoreScroll(listTags, 'tags');
@@ -744,9 +763,9 @@
 
       return wrap;
     }
-
     _renderPowers(){
       const container = document.createElement('div');
+      // 2x2 grid: top row lists, bottom row selected panels
       container.className='mmc-grid';
       container.style.gridTemplateColumns = '1fr 1fr';
 
@@ -757,7 +776,7 @@
       const grantedNameSet = new Set(grantedPowers.map(p=>String(p?.name||'').toLowerCase()));
       const originConsume = this._originGrantSubset(limit);
 
-      // LEFT: Basic
+      // TOP-LEFT: Basic
       const left = document.createElement('div'); left.className='mmc-card';
       left.innerHTML = `<h3>Básicos</h3>
         <input class="mmc-search" name="search-powers-basic" placeholder="Buscar..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">`;
@@ -765,7 +784,7 @@
       left.appendChild(listBasic);
       container.appendChild(left);
 
-      // RIGHT: Power Sets
+      // TOP-RIGHT: Power Sets
       const right = document.createElement('div'); right.className='mmc-card';
       right.innerHTML = `<h3>Power Sets</h3>`;
       const setSel = document.createElement('select');
@@ -827,12 +846,13 @@
         return row;
       };
 
+      // Render BASIC list
       listBasic.innerHTML='';
       allP.filter(p=>(p.system?.powerSet??'Basic')==='Basic').forEach(p=>listBasic.appendChild(buildRow(p)));
       this._bindScrollMemory(listBasic, 'powers-basic');
       _filterList(listBasic, q);
 
-      // Set list: family-aware listing
+      // Render SET list (family-aware)
       listSet.innerHTML='';
       const _mmcBaseName = (n)=> String(n||'').replace(/\s*\d+$/, '').trim().toLowerCase();
       const setLower = String(setName||'').toLowerCase().trim();
@@ -843,18 +863,20 @@
       shownList.forEach(p=>listSet.appendChild(buildRow(p)));
       this._bindScrollMemory(listSet, 'powers-set');
 
-      // Selected chips panel
-      const selCard = document.createElement('div'); selCard.className='mmc-card';
+      // BOTTOM-LEFT: Selected Basics
       const chosenCount = (this.state.chosenPowers||[]).length + (originConsume?.length||0);
-      selCard.innerHTML = `<h3>Selecionados — Poderes (${chosenCount} / ${limit})</h3>`;
-      const selGrid = document.createElement('div'); selGrid.className='mmc-grid';
-      const colL = document.createElement('div'); colL.className='mmc-card mmc-subcard'; colL.innerHTML='<h4>Básicos</h4>';
-      const chipsBasic = document.createElement('div'); chipsBasic.className='mmc-chips'; colL.appendChild(chipsBasic);
-      const colR = document.createElement('div'); colR.className='mmc-card mmc-subcard'; colR.innerHTML='<h4>Power Sets</h4>';
-      const chipsSet = document.createElement('div'); chipsSet.className='mmc-chips'; colR.appendChild(chipsSet);
-      selGrid.appendChild(colL); selGrid.appendChild(colR);
-      selCard.appendChild(selGrid);
-      container.appendChild(selCard);
+      const selBasic = document.createElement('div'); selBasic.className='mmc-card mmc-selected';
+      selBasic.innerHTML = `<h3>Selecionados — Básicos (${chosenCount} / ${limit})</h3>`;
+      const chipsBasic = document.createElement('div'); chipsBasic.className='mmc-chips';
+      selBasic.appendChild(chipsBasic);
+      container.appendChild(selBasic);
+
+      // BOTTOM-RIGHT: Selected Power Sets
+      const selSet = document.createElement('div'); selSet.className='mmc-card mmc-selected';
+      selSet.innerHTML = `<h3>Selecionados — Power Sets (${chosenCount} / ${limit})</h3>`;
+      const chipsSet = document.createElement('div'); chipsSet.className='mmc-chips';
+      selSet.appendChild(chipsSet);
+      container.appendChild(selSet);
 
       const chosenBasic = (this.state.chosenPowers||[]).filter(p=>(p.system?.powerSet??'Basic')==='Basic');
       const grantBasic = grantedPowers.filter(p=>(p.system?.powerSet??'Basic')==='Basic');
