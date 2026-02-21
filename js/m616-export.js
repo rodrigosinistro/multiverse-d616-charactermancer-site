@@ -216,8 +216,8 @@
       setText(form, 'Text41', normalizePdfText(long.tags.join('\n')), sizeTags);
       setText(form, 'Text42', normalizePdfText(long.traits.join('\n')), sizeTraits);
 
-      // Flatten to prevent weirdness on some viewers
-      try{ form.flatten(); }catch(_){/* ignore */}
+      // Keep form fields editable (do NOT flatten)
+      try{ form.updateFieldAppearances(helv); }catch(_){/* ignore */}
 
       // Optional extra pages (like module): details of powers/traits/tags descriptions
       const includeExtras = opts.includeExtras !== false;
@@ -245,21 +245,20 @@
           const { width, height } = pageRef.page.getSize();
 
           const margin = 48;
-          const colGap = 18;
-          const colW = (width - margin*2 - colGap) / 2;
+          const colW = (width - margin*2); // 1 coluna
           const lineH = 12;
 
           let x = margin;
           let y = height - margin;
 
-          const newColOrPage = ()=>{
-            if (x === margin){ x = margin + colW + colGap; y = height - margin; return; }
+          const newPage = ()=>{
             pageRef.page = pdfDoc.addPage();
-            x = margin; y = height - margin;
+            x = margin;
+            y = height - margin;
           };
 
           const ensureSpace = (need)=>{
-            if (y - need < margin){ newColOrPage(); }
+            if (y - need < margin) newPage();
           };
 
           const drawH1 = (txt)=>{
@@ -269,10 +268,10 @@
           };
 
           const drawP = (txt)=>{
-            const lines = wrapText(helv, txt, 9, colW);
+            const lines = wrapText(helv, txt, 9.5, colW);
             for (const ln of lines){
-              if (y < margin + 30) newColOrPage();
-              pageRef.page.drawText(ln, { x, y, size: 9, font: helv });
+              if (y < margin + 30) newPage();
+              pageRef.page.drawText(ln, { x, y, size: 9.5, font: helv });
               y -= lineH;
             }
           };

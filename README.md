@@ -19,7 +19,7 @@ Ele replica o **fluxo** e o **layout** do charactermancer do Foundry (módulo `m
 
 ### Exportar / Importar progresso
 
-Na etapa **Revisão**:
+Na etapa **Revisão** (barra inferior):
 
 - **Baixar JSON**: salva seu progresso.
 - **Importar JSON**: restaura seu progresso.
@@ -43,6 +43,8 @@ Este projeto é **100% estático**. Para publicar:
 
 - **Templates embutidos:** `assets/templates/` (os PDFs-base ficam no repositório — não apontam para fora).
 - **Libs via CDN:** atualmente o export usa `pdf-lib` e `FileSaver` via CDN (carregamento no navegador).
+- **Campos editáveis:** a **página principal** é gerada mantendo os **campos do template editáveis** (não é "flatten").
+- **Páginas extras (descrições):** são renderizadas como texto e usam **1 coluna** (sem layout em 2 colunas).
 
 ## Estrutura do projeto
 

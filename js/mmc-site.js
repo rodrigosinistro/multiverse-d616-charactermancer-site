@@ -1,12 +1,12 @@
 /* Multiverse D616 — Charactermancer Site
  * Web port based on the Foundry module: marvel-multiverse-charactermancer v0.1.3
- * Site version: v0.0.5
+ * Site version: v0.0.6
  */
 
 (function(){
   'use strict';
 
-  const SITE_VERSION = '0.0.5';
+  const SITE_VERSION = '0.0.6';
   const ROOT_ID = 'mmc-root';
 
   // ---------- Tiny "Foundry-like" stubs (to keep the original code structure) ----------
@@ -445,6 +445,13 @@
 
       const nav = document.createElement('div');
       nav.className = 'mmc-nav';
+
+      const leftGroup = document.createElement('div');
+      leftGroup.className = 'mmc-nav-group';
+
+      const rightGroup = document.createElement('div');
+      rightGroup.className = 'mmc-nav-group';
+
       const back = document.createElement('button');
       back.className = 'mmc-btn';
       back.textContent = game.i18n.localize('MMC.Back') || 'Voltar';
@@ -456,8 +463,58 @@
       next.textContent = (this.step===this.steps.length-1) ? (game.i18n.localize('MMC.Apply')||'Baixar PDF (M616)') : (game.i18n.localize('MMC.Next')||'Seguinte');
       next.addEventListener('click', ()=> this._onNext());
 
-      nav.appendChild(back);
-      nav.appendChild(next);
+      leftGroup.appendChild(back);
+
+      // Step 6 (Revisão): botões extras no rodapé
+      if (this.step === this.steps.length - 1){
+        const reset = document.createElement('button');
+        reset.className = 'mmc-btn';
+        reset.textContent = 'Resetar Tudo';
+        reset.addEventListener('click', ()=> this.resetAll());
+        leftGroup.appendChild(reset);
+
+        const djson = document.createElement('button');
+        djson.className = 'mmc-btn';
+        djson.textContent = 'Baixar JSON';
+        djson.addEventListener('click', ()=> this._downloadJson());
+
+        const ijson = document.createElement('button');
+        ijson.className = 'mmc-btn';
+        ijson.textContent = 'Importar JSON';
+
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'application/json';
+        fileInput.style.display = 'none';
+
+        ijson.addEventListener('click', ()=> fileInput.click());
+
+        fileInput.addEventListener('change', async ()=>{
+          const f = fileInput.files?.[0];
+          if (!f) return;
+          try{
+            const txt = await f.text();
+            const obj = JSON.parse(txt);
+            this._importState(obj);
+            ui.notifications.info('JSON importado.');
+          }catch(e){
+            console.error(e);
+            ui.notifications.error('Falha ao importar JSON.');
+          } finally {
+            fileInput.value='';
+          }
+        });
+
+        rightGroup.appendChild(djson);
+        rightGroup.appendChild(ijson);
+        rightGroup.appendChild(next);
+        rightGroup.appendChild(fileInput);
+      } else {
+        rightGroup.appendChild(next);
+      }
+
+      nav.appendChild(leftGroup);
+      nav.appendChild(rightGroup);
       wrap.appendChild(nav);
 
       return wrap;
@@ -1024,12 +1081,8 @@
             </label>
           </div>
         </div>
-        <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;">
-          <button type="button" class="mmc-btn" data-action="download-pdf">Baixar PDF (M616)</button>
-          <button type="button" class="mmc-btn" data-action="download-json">Baixar JSON</button>
-          <button type="button" class="mmc-btn" data-action="import-json">Importar JSON</button>
-          <button type="button" class="mmc-btn" data-action="reset-all">Resetar Tudo</button>
-          <input type="file" accept="application/json" style="display:none" data-file="import-json" />
+        <div class="mmc-small" style="margin-top:8px;opacity:.95;">
+          Use os botões na barra inferior para baixar PDF/JSON, importar JSON ou resetar.
         </div>
       `;
 
@@ -1050,29 +1103,6 @@
       extrasCb.checked = this.state.export.includeExtras !== false;
       extrasCb.addEventListener('change', ev=> this.state.export.includeExtras = !!ev.target.checked);
 
-      // Actions
-      const fileInput = wrap.querySelector('[data-file="import-json"]');
-
-      wrap.querySelector('[data-action="download-pdf"]').addEventListener('click', ()=> this._downloadPdf());
-      wrap.querySelector('[data-action="download-json"]').addEventListener('click', ()=> this._downloadJson());
-      wrap.querySelector('[data-action="import-json"]').addEventListener('click', ()=> fileInput.click());
-      wrap.querySelector('[data-action="reset-all"]').addEventListener('click', ()=> this.resetAll());
-
-      fileInput.addEventListener('change', async ()=>{
-        const f = fileInput.files?.[0];
-        if (!f) return;
-        try{
-          const txt = await f.text();
-          const obj = JSON.parse(txt);
-          this._importState(obj);
-          ui.notifications.info('JSON importado.');
-        }catch(e){
-          console.error(e);
-          ui.notifications.error('Falha ao importar JSON.');
-        } finally {
-          fileInput.value='';
-        }
-      });
 
       return wrap;
     }

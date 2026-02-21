@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.0.6
+
+- **UI (Revisão):** removido o botão duplicado **Baixar PDF (M616)** dentro do painel de exportação; o PDF continua disponível no botão principal do canto inferior direito.
+- **UI (Revisão):** **Baixar JSON** e **Importar JSON** agora ficam **ao lado esquerdo** do botão **Baixar PDF (M616)** na barra inferior (direita).
+- **UI (Revisão):** **Resetar Tudo** agora fica ao lado de **Voltar** na barra inferior (esquerda).
+- **PDF:** exportação agora **mantém os campos do template editáveis** (sem `flatten`).
+- **PDF (páginas extras):** descrições (pág. 2+) agora são geradas em **1 coluna**.
+
 ## v0.0.5
 
 - **UI:** no passo **4 (Traços & Tags)**, os itens selecionados agora aparecem em painéis separados abaixo das listas (**Traços** embaixo de Traços, **Tags** embaixo de Tags).
