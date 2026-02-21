@@ -202,6 +202,11 @@
       const ori = items.filter(i=>i.type==='origin').map(i=>i.name).join(', ');
       setText(form, 'Text51', occ);
       setText(form, 'Text52', ori);
+      // Extra bio fields (same as the Foundry exporter)
+      setText(form, 'Text53', nvl(get(sys,'teams'), ''));
+      setText(form, 'Text54', nvl(get(sys,'base'), ''));
+      setText(form, 'Text55', cleanText(get(sys,'history')));
+      setText(form, 'Text56', cleanText(get(sys,'personality')));
 
       // Long columns (Traits/Tags/Powers)
       const long = collectLong(actor);
@@ -210,11 +215,13 @@
       const sizeP1 = pickLongSize(long.pow1);
       const sizeP2 = pickLongSize(long.pow2);
       const sizeP3 = pickLongSize(long.pow3);
-      setText(form, 'Text38', normalizePdfText(long.pow1.join('\n')), sizeP1);
-      setText(form, 'Text39', normalizePdfText(long.pow2.join('\n')), sizeP2);
-      setText(form, 'Text40', normalizePdfText(long.pow3.join('\n')), sizeP3);
-      setText(form, 'Text41', normalizePdfText(long.tags.join('\n')), sizeTags);
-      setText(form, 'Text42', normalizePdfText(long.traits.join('\n')), sizeTraits);
+      // Field mapping follows the Foundry module (sheet-export-m616):
+      // Text38=Traits, Text39=Tags, Text40..42=Powers columns
+      setText(form, 'Text38', normalizePdfText(long.traits.join('\n')), sizeTraits);
+      setText(form, 'Text39', normalizePdfText(long.tags.join('\n')), sizeTags);
+      setText(form, 'Text40', normalizePdfText(long.pow1.join('\n')), sizeP1);
+      setText(form, 'Text41', normalizePdfText(long.pow2.join('\n')), sizeP2);
+      setText(form, 'Text42', normalizePdfText(long.pow3.join('\n')), sizeP3);
 
       // Keep form fields editable (do NOT flatten)
       try{ form.updateFieldAppearances(helv); }catch(_){/* ignore */}

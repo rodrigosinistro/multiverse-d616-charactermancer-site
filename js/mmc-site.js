@@ -1,12 +1,12 @@
 /* Multiverse D616 — Charactermancer Site
  * Web port based on the Foundry module: marvel-multiverse-charactermancer v0.1.3
- * Site version: v0.0.8
+ * Site version: v0.0.9
  */
 
 (function(){
   'use strict';
 
-  const SITE_VERSION = '0.0.8';
+  const SITE_VERSION = '0.0.9';
   const ROOT_ID = 'mmc-root';
 
   // ---------- Tiny "Foundry-like" stubs (to keep the original code structure) ----------
@@ -418,11 +418,8 @@
     _updateTip(){
       const el = document.getElementById('mmc-tip');
       if (!el) return;
-      if (this.step === 0){
-        el.textContent = 'Dica: Esse criador de personagem foi desenvolvido para ser utilizado no Foundry VTT e com o sistema Multiverse D616.';
-      } else {
-        el.innerHTML = 'Dica: o PDF usa <code>pdf-lib</code> e <code>FileSaver</code> via CDN no momento.';
-      }
+      // Same tip on all steps (per project requirement)
+      el.textContent = 'Dica: Esse criador de personagem foi desenvolvido para ser utilizado no Foundry VTT e com o sistema Multiverse D616.';
     }
 
     async _renderStep(){
@@ -714,10 +711,36 @@
       // 2x2 grid like the Foundry module: top row lists, bottom row selected panels
       wrap.className='mmc-grid';
 
+      // Helpers/state
+      this.state.search = this.state.search || {};
+      this.state.scroll = this.state.scroll || {};
+      this.state.selectedTraits = this.state.selectedTraits || [];
+      this.state.selectedTags = this.state.selectedTags || [];
+
+      // Granted by Occupation/Origin
+      const grantedTraits = [ ...(this.state.occupation?.system?.traits||[]), ...(this.state.origin?.system?.traits||[]) ].filter(Boolean);
+      const grantedTags   = [ ...(this.state.occupation?.system?.tags||[]),   ...(this.state.origin?.system?.tags||[])   ].filter(Boolean);
+
+      // Build id and name sets for reliable matching
+      const traitIdSet = new Set(grantedTraits.map(t=>t?._id).filter(Boolean));
+      const traitNameSet = new Set(grantedTraits.map(t=>(t?.name||'').toLowerCase()).filter(Boolean));
+      const tagIdSet = new Set(grantedTags.map(t=>t?._id).filter(Boolean));
+      const tagNameSet = new Set(grantedTags.map(t=>(t?.name||'').toLowerCase()).filter(Boolean));
+      const isConnections = (nm)=> /^(connections|conexões)$/i.test(nm||'');
+
+      // Rules (same as Foundry module): extra Traits allowed = current Rank
+      const extraAllowed = Number(this.state.rank || 1);
+      const used = (this.state.selectedTraits || []).length;
+      const remaining = Math.max(0, extraAllowed - used);
+
+      const traits = MMCCharactermancer._mmcDedupByName([...(this.state.data.traits||[])]);
+      const tags   = MMCCharactermancer._mmcDedupByName([...(this.state.data.tags||[])]);
+
       // Top-left: Traits
       const leftTop = document.createElement('div'); leftTop.className='mmc-card';
       leftTop.innerHTML = `<h3>Traços</h3>
-        <input class="mmc-search" placeholder="Buscar..." name="search-traits" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">`;
+        <div id="mmc-traits-remaining" class="mmc-small">Traços extras restantes: ${remaining} (de ${extraAllowed})</div>
+        <input class="mmc-search" placeholder="Buscar..." name="search-traits" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="${this.state.search?.traits||''}">`;
       const listTraits = document.createElement('div'); listTraits.className='mmc-list mmc-scroll';
       leftTop.appendChild(listTraits);
       wrap.appendChild(leftTop);
@@ -725,7 +748,7 @@
       // Top-right: Tags
       const rightTop = document.createElement('div'); rightTop.className='mmc-card';
       rightTop.innerHTML = `<h3>Tags</h3>
-        <input class="mmc-search" placeholder="Buscar..." name="search-tags" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">`;
+        <input class="mmc-search" placeholder="Buscar..." name="search-tags" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" value="${this.state.search?.tags||''}">`;
       const listTags = document.createElement('div'); listTags.className='mmc-list mmc-scroll';
       rightTop.appendChild(listTags);
       wrap.appendChild(rightTop);
@@ -743,12 +766,6 @@
       const chipsTags = document.createElement('div'); chipsTags.className='mmc-chips';
       selTags.appendChild(chipsTags);
       wrap.appendChild(selTags);
-
-      const grantedTraits = [ ...(this.state.occupation?.system?.traits||[]), ...(this.state.origin?.system?.traits||[]) ];
-      const grantedTags = [ ...(this.state.occupation?.system?.tags||[]), ...(this.state.origin?.system?.tags||[]) ];
-
-      const traits = MMCCharactermancer._mmcDedupByName([...(this.state.data.traits||[])]);
-      const tags = MMCCharactermancer._mmcDedupByName([...(this.state.data.tags||[])]);
 
       const mkChip = (label, removeFn, granted=false)=>{
         const c = document.createElement('div');
@@ -784,55 +801,126 @@
         })));
       };
 
-      const renderList = (kind, listEl, data, q)=>{
-        listEl.innerHTML='';
-        const qlc = (q||'').toLowerCase();
-        const chosen = kind==='trait' ? (this.state.selectedTraits||[]) : (this.state.selectedTags||[]);
-        const granted = kind==='trait' ? grantedTraits : grantedTags;
-        const chosenNames = new Set(chosen.map(x=>String(x?.name||'').toLowerCase()));
-        const grantedNames = new Set(granted.map(x=>String(x?.name||'').toLowerCase()));
+      const renderListTraits = ()=>{
+        const prev = listTraits.scrollTop;
+        listTraits.innerHTML='';
+        const qlc = (this.state.search?.traits||'').toLowerCase();
 
-        data
-          .filter(o=> String(o?.name||'').toLowerCase().includes(qlc) || String(o.system?.description||'').toLowerCase().includes(qlc))
-          .forEach(o=>{
+        // Recompute remaining to reflect current selection
+        const extraAllowedNow = Number(this.state.rank || 1);
+        const usedNow = (this.state.selectedTraits || []).length;
+        const remainingNow = Math.max(0, extraAllowedNow - usedNow);
+        const remEl = leftTop.querySelector('#mmc-traits-remaining');
+        if (remEl) remEl.textContent = `Traços extras restantes: ${remainingNow} (de ${extraAllowedNow})`;
+
+        traits
+          .filter(t => {
+            const nm = String(t?.name||'').toLowerCase();
+            const desc = String(t?.system?.description||'').toLowerCase();
+            return nm.includes(qlc) || desc.includes(qlc);
+          })
+          // Hide granted traits unless "Connections" (same as Foundry module)
+          .filter(t => !(traitIdSet.has(t._id) || traitNameSet.has((t.name||'').toLowerCase())) || isConnections(t.name))
+          .forEach(t=>{
             const row = document.createElement('div'); row.className='mmc-pwr';
-            const nm = String(o?.name||'');
-            const lower = nm.toLowerCase();
-            let btn = '';
-            if (grantedNames.has(lower)) btn = `<button class="mmc-btn" disabled>Concedido</button>`;
-            else if (chosenNames.has(lower)) btn = `<button class="mmc-btn" disabled>Selecionado</button>`;
-            else btn = `<button class="mmc-btn" data-add="${o._id}">Selecionar</button>`;
+            const picked = !!(this.state.selectedTraits||[]).find(x=>x._id===t._id || (x.name||'').toLowerCase()===(t.name||'').toLowerCase());
+            const disableByGrant = (traitIdSet.has(t._id) || traitNameSet.has((t.name||'').toLowerCase())) && !isConnections(t.name);
+            const disableByPicked = picked && !isConnections(t.name);
+            const disabled = disableByGrant || disableByPicked || remainingNow<=0;
 
-            row.innerHTML = `<div class="name">${nm}</div><div class="desc">${o.system?.description||''}</div><div>${btn}</div>`;
-            listEl.appendChild(row);
+            let action = `<button class="mmc-btn" data-add-trait="${t._id}" ${disabled?'disabled':''}>Selecionar</button>`;
+            if (disableByGrant) action = `<button class="mmc-btn" disabled>Concedido</button>`;
+            if (!disableByGrant && disableByPicked) action = `<button class="mmc-btn" disabled>Selecionado</button>`;
+
+            row.innerHTML = `<div class="name">${t.name||''}</div><div class="desc">${t.system?.description||''}</div><div>${action}</div>`;
+            listTraits.appendChild(row);
           });
 
-        listEl.querySelectorAll('[data-add]').forEach(btn=>btn.addEventListener('click',(ev)=>{
-          const id = ev.currentTarget.dataset.add;
-          const it = data.find(x=>x._id===id);
-          if (!it) return;
+        listTraits.scrollTop = prev;
+        requestAnimationFrame(()=>{ try{ listTraits.scrollTop = prev; }catch(_){ } });
+
+        listTraits.querySelectorAll('[data-add-trait]').forEach(btn=>btn.addEventListener('click',(ev)=>{
+          const id = ev.currentTarget.dataset.addTrait;
+          const obj = traits.find(x=>x._id===id);
+          if (!obj) return;
+
+          const extraAllowedNow = Number(this.state.rank || 1);
+          const usedNow = (this.state.selectedTraits || []).length;
+          const remainingNow = Math.max(0, extraAllowedNow - usedNow);
+          if (remainingNow <= 0){
+            ui.notifications?.warn?.('Você já escolheu todos os Traços bônus.');
+            return;
+          }
+          // prevent dup by name when not Connections
+          if (!isConnections(obj.name)){
+            const dupByName = (this.state.selectedTraits||[]).some(x => (x.name||'').toLowerCase()===(obj.name||'').toLowerCase());
+            if (dupByName) return;
+          }
+
           try{ this.state.scroll.traits = listTraits.scrollTop; }catch(_){ }
           try{ this.state.scroll.tags = listTags.scrollTop; }catch(_){ }
-          if (kind==='trait') this.state.selectedTraits = [...(this.state.selectedTraits||[]), it];
-          else this.state.selectedTags = [...(this.state.selectedTags||[]), it];
+          this.state.selectedTraits = [...(this.state.selectedTraits||[]), obj];
+          this._refreshPowerChips();
+        }));
+      };
+
+      const renderListTags = ()=>{
+        const prev = listTags.scrollTop;
+        listTags.innerHTML='';
+        const qlc = (this.state.search?.tags||'').toLowerCase();
+        const chosenNames = new Set((this.state.selectedTags||[]).map(x=>String(x?.name||'').toLowerCase()));
+
+        tags
+          .filter(t => {
+            const nm = String(t?.name||'').toLowerCase();
+            const desc = String(t?.system?.description||'').toLowerCase();
+            return nm.includes(qlc) || desc.includes(qlc);
+          })
+          .forEach(t=>{
+            const row = document.createElement('div'); row.className='mmc-pwr';
+            const granted = tagIdSet.has(t._id) || tagNameSet.has((t.name||'').toLowerCase());
+            const picked = chosenNames.has((t.name||'').toLowerCase());
+            let action = `<button class="mmc-btn" data-add-tag="${t._id}">Selecionar</button>`;
+            if (granted) action = `<button class="mmc-btn" disabled>Concedido</button>`;
+            else if (picked) action = `<button class="mmc-btn" disabled>Selecionado</button>`;
+            row.innerHTML = `<div class="name">${t.name||''}</div><div class="desc">${t.system?.description||''}</div><div>${action}</div>`;
+            listTags.appendChild(row);
+          });
+
+        listTags.scrollTop = prev;
+        requestAnimationFrame(()=>{ try{ listTags.scrollTop = prev; }catch(_){ } });
+
+        listTags.querySelectorAll('[data-add-tag]').forEach(btn=>btn.addEventListener('click',(ev)=>{
+          const id = ev.currentTarget.dataset.addTag;
+          const obj = tags.find(x=>x._id===id);
+          if (!obj) return;
+          // prevent dup by name
+          const dupByName = (this.state.selectedTags||[]).some(x => (x.name||'').toLowerCase()===(obj.name||'').toLowerCase());
+          if (dupByName) return;
+          try{ this.state.scroll.traits = listTraits.scrollTop; }catch(_){ }
+          try{ this.state.scroll.tags = listTags.scrollTop; }catch(_){ }
+          this.state.selectedTags = [...(this.state.selectedTags||[]), obj];
           this._refreshPowerChips();
         }));
       };
 
       renderSelected();
-      renderList('trait', listTraits, traits, '');
-      renderList('tag', listTags, tags, '');
+      renderListTraits();
+      renderListTags();
+
       this._bindScrollMemory(listTraits, 'traits');
       this._bindScrollMemory(listTags, 'tags');
 
       leftTop.querySelector('input[name="search-traits"]').addEventListener('input', (ev)=>{
+        this.state.search.traits = ev.target.value;
         this.state.scroll.traits = listTraits.scrollTop;
-        renderList('trait', listTraits, traits, ev.target.value);
+        renderListTraits();
         this._restoreScroll(listTraits, 'traits');
       });
       rightTop.querySelector('input[name="search-tags"]').addEventListener('input', (ev)=>{
+        this.state.search.tags = ev.target.value;
         this.state.scroll.tags = listTags.scrollTop;
-        renderList('tag', listTags, tags, ev.target.value);
+        renderListTags();
         this._restoreScroll(listTags, 'tags');
       });
 

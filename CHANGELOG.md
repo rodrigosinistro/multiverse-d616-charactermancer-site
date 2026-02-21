@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.0.9
+
+- **UI:** a dica do rodapé agora é a mesma em **todas as telas** (não muda por etapa).
+- **Regras (Passo 4 — Traços & Tags):** aplicado o limite de **Traços bônus = Rank** (com contador “Traços extras restantes”).
+- **PDF (M616):** corrigido o mapeamento dos campos longos do template:
+  - **Text38 = Traços**, **Text39 = Tags**, **Text40–42 = Poderes** (3 colunas), igual ao `sheet-export-m616`.
+- **PDF (M616):** preenchidos também os campos de biografia do template (**Teams/Base/History/Personality**) quando existirem no Actor.
+
 ## v0.0.8
 
 - **Fix crítico:** corrigido um erro de sintaxe em `js/mmc-site.js` que impedia o app de renderizar no GitHub Pages (página ficava em branco).

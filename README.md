@@ -15,6 +15,7 @@ Ele replica o **fluxo** e o **layout** do charactermancer do Foundry (módulo `m
    - Opcional: use **Importar JSON** para carregar um **Actor JSON do Foundry VTT (Multiverse D616)**.
 2. **Ocupação** e **Origem**.
 3. **Traços & Tags**.
+   - **Traços bônus**: a quantidade de Traços extras selecionáveis é limitada pelo **Rank** (igual ao charactermancer do Foundry).
 4. **Poderes** (respeitando pré-requisitos e limite do Rank).
 5. **Revisão**: preencha a Biografia e clique em **Baixar PDF (M616)**.
 
@@ -38,6 +39,8 @@ Este projeto é **100% estático**. Para publicar:
 - **Libs via CDN:** atualmente o export usa `pdf-lib` e `FileSaver` via CDN (carregamento no navegador).
 - **Campos editáveis:** a **página principal** é gerada mantendo os **campos do template editáveis** (não é *flatten*).
 - **Páginas extras (descrições):** são renderizadas como texto e usam **1 coluna**.
+
+> Observação: o preenchimento de Traços/Tags/Poderes segue o mesmo mapeamento de campos do módulo `sheet-export-m616`.
 
 ## JSON (Foundry VTT — Multiverse D616)
 
