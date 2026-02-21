@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.0.7
+
+- **UI (Passo 1):** dica atualizada para: “Esse criador de personagem foi desenvolvido para ser utilizado no Foundry VTT e com o sistema Multiverse D616.”
+- **UI (Passo 1):** botão **Importar JSON** agora fica **centralizado** entre **Voltar** e **Seguinte**.
+- **UI (Passo 6):** removido o botão **Importar JSON** (importação agora é feita no passo 1).
+- **JSON (Foundry):** **Importar JSON** agora aceita o **JSON de Actor exportado pelo Foundry VTT (sistema Multiverse D616)** e carrega Rank, Atributos, Bio, Ocupação/Origem, Traços/Tags e Poderes.
+- **JSON (Foundry):** **Baixar JSON** agora exporta um **Actor JSON compatível com Foundry VTT / Multiverse D616** (padrão de export do Foundry).
+
 ## v0.0.6
 
 - **UI (Revisão):** removido o botão duplicado **Baixar PDF (M616)** dentro do painel de exportação; o PDF continua disponível no botão principal do canto inferior direito.

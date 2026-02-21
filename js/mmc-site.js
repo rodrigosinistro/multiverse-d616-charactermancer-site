@@ -1,12 +1,12 @@
 /* Multiverse D616 — Charactermancer Site
  * Web port based on the Foundry module: marvel-multiverse-charactermancer v0.1.3
- * Site version: v0.0.6
+ * Site version: v0.0.7
  */
 
 (function(){
   'use strict';
 
-  const SITE_VERSION = '0.0.6';
+  const SITE_VERSION = '0.0.7';
   const ROOT_ID = 'mmc-root';
 
   // ---------- Tiny "Foundry-like" stubs (to keep the original code structure) ----------
@@ -410,7 +410,21 @@
     // ---------- Rendering ----------
     async render(force){
       await this._ensureData();
-      return super.render(force);
+      const r = await super.render(force);
+      try{ this._updateTip(); }catch(_){ }
+      
+
+    _updateTip(){
+      const el = document.getElementById('mmc-tip');
+      if (!el) return;
+      if (this.step === 0){
+        el.textContent = 'Dica: Esse criador de personagem foi desenvolvido para ser utilizado no Foundry VTT e com o sistema Multiverse D616.';
+      } else {
+        el.innerHTML = 'Dica: o PDF usa <code>pdf-lib</code> e <code>FileSaver</code> via CDN no momento.';
+      }
+    }
+
+return r;
     }
 
     async _renderStep(){
@@ -449,6 +463,9 @@
       const leftGroup = document.createElement('div');
       leftGroup.className = 'mmc-nav-group';
 
+      const centerGroup = document.createElement('div');
+      centerGroup.className = 'mmc-nav-group mmc-nav-center';
+
       const rightGroup = document.createElement('div');
       rightGroup.className = 'mmc-nav-group';
 
@@ -465,19 +482,8 @@
 
       leftGroup.appendChild(back);
 
-      // Step 6 (Revisão): botões extras no rodapé
-      if (this.step === this.steps.length - 1){
-        const reset = document.createElement('button');
-        reset.className = 'mmc-btn';
-        reset.textContent = 'Resetar Tudo';
-        reset.addEventListener('click', ()=> this.resetAll());
-        leftGroup.appendChild(reset);
-
-        const djson = document.createElement('button');
-        djson.className = 'mmc-btn';
-        djson.textContent = 'Baixar JSON';
-        djson.addEventListener('click', ()=> this._downloadJson());
-
+      // Step 1 (Rank & Atributos): Import JSON centralizado
+      if (this.step === 0){
         const ijson = document.createElement('button');
         ijson.className = 'mmc-btn';
         ijson.textContent = 'Importar JSON';
@@ -493,9 +499,7 @@
           const f = fileInput.files?.[0];
           if (!f) return;
           try{
-            const txt = await f.text();
-            const obj = JSON.parse(txt);
-            this._importState(obj);
+            await this._importJsonFile(f);
             ui.notifications.info('JSON importado.');
           }catch(e){
             console.error(e);
@@ -505,15 +509,31 @@
           }
         });
 
+        centerGroup.appendChild(ijson);
+        centerGroup.appendChild(fileInput);
+      }
+
+      // Step 6 (Revisão): botões extras no rodapé (sem Import aqui)
+      if (this.step === this.steps.length - 1){
+        const reset = document.createElement('button');
+        reset.className = 'mmc-btn';
+        reset.textContent = 'Resetar Tudo';
+        reset.addEventListener('click', ()=> this.resetAll());
+        leftGroup.appendChild(reset);
+
+        const djson = document.createElement('button');
+        djson.className = 'mmc-btn';
+        djson.textContent = 'Baixar JSON';
+        djson.addEventListener('click', ()=> this._downloadJson());
+
         rightGroup.appendChild(djson);
-        rightGroup.appendChild(ijson);
         rightGroup.appendChild(next);
-        rightGroup.appendChild(fileInput);
       } else {
         rightGroup.appendChild(next);
       }
 
       nav.appendChild(leftGroup);
+      nav.appendChild(centerGroup);
       nav.appendChild(rightGroup);
       wrap.appendChild(nav);
 
@@ -1205,25 +1225,36 @@
     }
 
     _downloadJson(){
-      const payload = {
-        _type: 'multiverse-d616-charactermancer-site',
-        version: SITE_VERSION,
-        step: this.step,
-        state: this.state
-      };
+      const payload = this._buildFoundryActorJson();
       const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${(this.state.bio.codename||this.state.bio.realname||'character').replace(/[^\w\-]+/g,'_')}.json`;
+      const name = (this.state.bio.codename||this.state.bio.realname||'actor').replace(/[^\w\-]+/g,'_');
+      a.download = `fvtt-Actor-${name}.json`;
       document.body.appendChild(a);
       a.click();
       a.remove();
       setTimeout(()=>URL.revokeObjectURL(url), 1000);
     }
 
-    _importState(obj){
-      // Accept either our wrapper or a raw state dump
+    async _importJsonFile(file){
+      const txt = await file.text();
+      const obj = JSON.parse(txt);
+
+      // Accept wrapper: { _type, version, step, state }
+      if (obj && (obj._type === 'multiverse-d616-charactermancer-site' || obj.state)){
+        return this._importStateInternal(obj);
+      }
+
+      // Foundry Actor export: direct actor document or wrapped under {actor:...}
+      const actor = (obj?.system && Array.isArray(obj?.items)) ? obj : (obj?.actor?.system && Array.isArray(obj?.actor?.items) ? obj.actor : null);
+      if (!actor) throw new Error('Formato de JSON não reconhecido.');
+
+      await this._importFoundryActor(actor);
+    }
+
+    _importStateInternal(obj){
       const incoming = obj?.state ?? obj;
       if (!incoming || typeof incoming !== 'object') throw new Error('invalid');
 
@@ -1237,9 +1268,196 @@
       this.state.actorModel = keepActorModel;
       this.state.powerSets = keepPowerSets;
 
-      this.step = Math.max(0, Math.min(this.steps.length-1, Number(obj?.step ?? this.step)));
+      this.step = 0;
       this.render(true);
     }
+
+    async _importFoundryActor(actor){
+      // Preserve the original actor as a base (prototypeToken, movement, etc.)
+      try{
+        this.state.foundry = this.state.foundry || {};
+        this.state.foundry.baseActor = deepClone(actor);
+      }catch(_){ /* ignore */ }
+
+      // Rank
+      const rawRank = Number(actor?.system?.attributes?.rank?.value ?? actor?.system?.attributes?.rank ?? 1);
+      const rank = Math.max(1, Math.min(6, isNaN(rawRank)?1:rawRank));
+      this.state.rank = rank;
+      this.state.maxAbility = this._getMaxAttributeForRank(rank);
+
+      // Abilities (M.A.R.V.E.L.)
+      const keys = ['mle','agl','res','vig','ego','log'];
+      for (const k of keys){
+        const v = Number(actor?.system?.abilities?.[k]?.value ?? 0);
+        this.state.abilities[k] = isNaN(v) ? 0 : v;
+      }
+
+      // Bio / identity
+      const bioKeys = ['codename','realname','gender','size','height','weight','eyes','hair','teams','base','history','personality','distinguishingFeatures'];
+      for (const k of bioKeys){
+        if (actor?.system?.[k] !== undefined) this.state.bio[k] = actor.system[k] ?? '';
+      }
+      if (this.state.bio?.size) this.state.bio.size = String(this.state.bio.size).toLowerCase();
+
+      // Helper: find by name in our datasets
+      const findByName = (arr, name)=>{
+        const n = String(name||'').trim().toLowerCase();
+        if (!n) return null;
+        return (arr||[]).find(it=> String(it?.name||'').trim().toLowerCase() === n) || null;
+      };
+
+      // Occupation & Origin (prefer items[], fallback to system.occupations/origins names)
+      const items = Array.isArray(actor?.items) ? actor.items : [];
+      const occItem = items.find(i=>i?.type==='occupation') || null;
+      const orgItem = items.find(i=>i?.type==='origin') || null;
+
+      const occName = occItem?.name || actor?.system?.occupations?.[0]?.name;
+      const orgName = orgItem?.name || actor?.system?.origins?.[0]?.name;
+
+      this.state.occupation = findByName(this.state.data.occupations, occName) || occItem || null;
+      this.state.origin = findByName(this.state.data.origins, orgName) || orgItem || null;
+
+      // Granted Traits/Tags (from occupation/origin definitions)
+      const grantedTraits = [ ...(this.state.occupation?.system?.traits||[]), ...(this.state.origin?.system?.traits||[]) ];
+      const grantedTags   = [ ...(this.state.occupation?.system?.tags||[]),   ...(this.state.origin?.system?.tags||[])   ];
+      const grantedTraitNames = new Set(grantedTraits.map(t=>String(t?.name||'').toLowerCase()));
+      const grantedTagNames   = new Set(grantedTags.map(t=>String(t?.name||'').toLowerCase()));
+
+      // Traits/Tags selected explicitly
+      const traitItems = items.filter(i=>i?.type==='trait');
+      const tagItems   = items.filter(i=>i?.type==='tag');
+
+      const pickedTraits = [];
+      for (const t of traitItems){
+        const n = String(t?.name||'').toLowerCase();
+        if (!n || grantedTraitNames.has(n)) continue;
+        pickedTraits.push(findByName(this.state.data.traits, t.name) || t);
+      }
+      const pickedTags = [];
+      for (const t of tagItems){
+        const n = String(t?.name||'').toLowerCase();
+        if (!n || grantedTagNames.has(n)) continue;
+        pickedTags.push(findByName(this.state.data.tags, t.name) || t);
+      }
+      this.state.selectedTraits = MMCCharactermancer._mmcDedupByName(pickedTraits);
+      this.state.selectedTags = MMCCharactermancer._mmcDedupByName(pickedTags);
+
+      // Powers (skip granted ones)
+      const powerItems = items.filter(i=>i?.type==='power');
+
+      // Compute granted powers from current occupation/origin
+      const limit = this._computePowerLimit();
+      const grantedPowers = [ ...(this._getGrantedPowers()||[]).filter(p=>p._grantedFrom!=='origin'), ...this._originGrantSubset(limit) ];
+      const grantedPowerNames = new Set(grantedPowers.map(p=>String(p?.name||'').toLowerCase()));
+      const grantedPowerIds = new Set(grantedPowers.map(p=>p?._id).filter(Boolean));
+
+      const lookupPower = (power)=>{
+        const nm = String(power?.name||'').trim().toLowerCase();
+        const set = String(power?.system?.powerSet || power?.system?.powerSetName || '').trim().toLowerCase();
+        // Try strict match by name+set, fallback by name only
+        const all = (this.state.data.powers||[]);
+        const byNameSet = all.find(p=> String(p?.name||'').trim().toLowerCase()===nm && String(p?.system?.powerSet||'').trim().toLowerCase()===set);
+        if (byNameSet) return byNameSet;
+        const byName = all.find(p=> String(p?.name||'').trim().toLowerCase()===nm);
+        return byName || null;
+      };
+
+      const chosen = [];
+      for (const p of powerItems){
+        const n = String(p?.name||'').toLowerCase();
+        if (!n) continue;
+        const isGranted = grantedPowerNames.has(n) || (p?._id && grantedPowerIds.has(p._id));
+        if (isGranted) continue;
+
+        const mapped = lookupPower(p) || p;
+        // Ensure minimal fields for non-catalog powers
+        if (!mapped.type) mapped.type = 'power';
+        if (!mapped.system) mapped.system = (p.system||{});
+        if (mapped.system && mapped.system.powerSet == null && p?.system?.powerSet != null) mapped.system.powerSet = p.system.powerSet;
+        chosen.push(mapped);
+      }
+      this.state.chosenPowers = MMCCharactermancer._mmcDedupPowersByNameAndSet(chosen);
+
+      // Pick a reasonable Power Set dropdown value after import
+      const nonBasic = (this.state.chosenPowers||[]).find(p=>String(p?.system?.powerSet||'Basic')!=='Basic');
+      if (nonBasic?.system?.powerSet) this.state.powerSet = nonBasic.system.powerSet;
+      else this.state.powerSet = (this.state.powerSets?.[0] ?? '');
+
+      // Always return to Step 1 after import
+      this.step = 0;
+      this.render(true);
+    }
+
+    _buildFoundryActorJson(){
+      const base = (this.state.foundry?.baseActor) ? deepClone(this.state.foundry.baseActor) : deepClone(this.state.actorModel ?? {});
+      if (!base?.system) base.system = {};
+      if (!base?.system?.attributes) base.system.attributes = {};
+      if (!base.system.attributes.rank) base.system.attributes.rank = { value: 1 };
+
+      base.system.attributes.rank.value = this.state.rank;
+
+      // Abilities
+      if (!base.system.abilities) base.system.abilities = {};
+      for (const k of Object.keys(this.state.abilities||{})){
+        base.system.abilities[k] = base.system.abilities[k] || {};
+        base.system.abilities[k].value = this.state.abilities[k];
+      }
+
+      // Health/Focus (same logic as PDF export)
+      const calc = (v)=> Math.max(10, (v??0)*30);
+      base.system.health = base.system.health || {};
+      base.system.focus  = base.system.focus  || {};
+      base.system.health.max = calc(this.state.abilities.res);
+      base.system.health.value = base.system.health.max;
+      base.system.focus.max = calc(this.state.abilities.vig);
+      base.system.focus.value = base.system.focus.max;
+
+      // Bio fields
+      for (const [k,v] of Object.entries(this.state.bio||{})) base.system[k] = v;
+      base.name = (this.state.bio.codename?.trim()) || (this.state.bio.realname?.trim()) || base.name || 'Herói';
+
+      // Items — mimic charactermancer export (include granted on the actor file)
+      const items = [];
+      if (this.state.occupation) items.push(this.state.occupation);
+      if (this.state.origin) items.push(this.state.origin);
+
+      const grantedTraits = [ ...(this.state.occupation?.system?.traits || []), ...(this.state.origin?.system?.traits || []) ];
+      const grantedTags   = [ ...(this.state.occupation?.system?.tags   || []), ...(this.state.origin?.system?.tags   || []) ];
+
+      const preparedTraits = MMCCharactermancer._mmcDedupByName([ ...grantedTraits, ...(this.state.selectedTraits||[]) ]).map(it=>{
+        const clone = deepClone(it ?? {});
+        if (!clone.type) clone.type = 'trait';
+        return clone;
+      });
+      const preparedTags = MMCCharactermancer._mmcDedupByName([ ...grantedTags, ...(this.state.selectedTags||[]) ]).map(it=>{
+        const clone = deepClone(it ?? {});
+        if (!clone.type) clone.type = 'tag';
+        return clone;
+      });
+
+      const limit = this._computePowerLimit();
+      const grantedPowers = [ ...(this._getGrantedPowers()||[]).filter(p=>p._grantedFrom!=='origin'), ...this._originGrantSubset(limit) ];
+      const byName = new Set(grantedPowers.map(p=>(p.name||'').toLowerCase()));
+      const chosen = (this.state.chosenPowers||[]).filter(p=> !byName.has((p.name||'').toLowerCase()));
+
+      items.push(...preparedTraits, ...preparedTags, ...grantedPowers, ...chosen);
+
+      base.items = [];
+      for (const it of items){
+        const kind = it?.type || it?.mmcKind || (it?.system?.powerSet ? 'power' : undefined);
+        const clone = deepClone(it ?? {});
+        if (!clone.type && kind) clone.type = kind;
+        base.items.push(clone);
+      }
+
+      // Effects remain as-is; optional
+      return base;
+    }
+
+    _importState(obj){
+      return this._importStateInternal(obj);
+    }
+
 
     resetAll(){
       this.step = 0;

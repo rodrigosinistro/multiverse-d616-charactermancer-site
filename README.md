@@ -12,6 +12,7 @@ Ele replica o **fluxo** e o **layout** do charactermancer do Foundry (módulo `m
 ## Como usar
 
 1. **Rank & Atributos**: escolha o Rank e distribua os atributos (M.A.R.V.E.L.).
+   - Opcional: use **Importar JSON** para carregar um **Actor JSON do Foundry VTT (Multiverse D616)**.
 2. **Ocupação** e **Origem**.
 3. **Traços & Tags**.
 4. **Poderes** (respeitando pré-requisitos e limite do Rank).
@@ -63,3 +64,12 @@ Abra uma **Issue** no GitHub com:
 2. **Print** (ou vídeo curto) do que aconteceu.
 3. Se possível, anexe um **JSON exportado** na etapa *Revisão* (ajuda muito a reproduzir o estado).
 4. Informe navegador e sistema (ex.: Chrome/Edge + Windows).
+
+
+## JSON (Foundry VTT)
+
+- **Importar JSON (Passo 1):** aceita o **JSON de Actor exportado pelo Foundry VTT** usando o sistema **Multiverse D616**.
+- **Baixar JSON (Passo 6):** gera um **Actor JSON compatível** para você importar no Foundry (**Multiverse D616**).
+
+> Dica: se você exportar um personagem do Foundry (Actor → Export Data) e importar aqui, o site tenta mapear automaticamente Rank, Atributos, Bio, Ocupação/Origem, Traços/Tags e Poderes.
+

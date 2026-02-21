@@ -113,6 +113,8 @@
 /* Footer nav */
 .mmc-nav { display:flex; justify-content:space-between; margin-top:12px; gap:12px; align-items:center; }
 .mmc-nav-group { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+.mmc-nav-center { flex:1; justify-content:center; }
+
 
 /* v0.6.5 */
 .mmc-selected, .mmc-review { color:#ffffff !important; }
