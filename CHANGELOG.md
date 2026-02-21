@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.0.4
+
+- **Fix:** as listas (Rank, Ocupação, Origem, Traços/Tags e Poderes) agora **mantêm a posição de rolagem** ao selecionar itens e ao voltar para a etapa.
+- **Melhoria:** memória de scroll mais robusta (salva durante a rolagem e restaura após re-renderização).
+
 ## v0.0.3
 
 - Ajuste do fluxo final para **Baixar PDF (M616)** no último passo.

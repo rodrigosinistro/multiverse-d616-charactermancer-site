@@ -1,12 +1,12 @@
 /* Multiverse D616 — Charactermancer Site
  * Web port based on the Foundry module: marvel-multiverse-charactermancer v0.1.3
- * Site version: v0.0.3
+ * Site version: v0.0.4
  */
 
 (function(){
   'use strict';
 
-  const SITE_VERSION = '0.0.3';
+  const SITE_VERSION = '0.0.4';
   const ROOT_ID = 'mmc-root';
 
   // ---------- Tiny "Foundry-like" stubs (to keep the original code structure) ----------
@@ -151,6 +151,16 @@
           }catch(_){}
         });
       }catch(_){}
+    }
+
+    _bindScrollMemory(el, key){
+      if (!el || !key) return;
+      // Restore first (useful when returning to a step)
+      this._restoreScroll(el, key);
+      // Keep memory updated as the user scrolls
+      el.addEventListener('scroll', ()=>{
+        try{ this.state.scroll[key] = el.scrollTop; }catch(_){ }
+      }, { passive: true });
     }
 
     static mmcDebounce(fn, wait=200){
@@ -471,7 +481,7 @@
         list.appendChild(row);
       });
       left.appendChild(list);
-      try{ if (this.state.scroll?.rankList!=null) list.scrollTop = this.state.scroll.rankList; }catch(_){ }
+      this._bindScrollMemory(list, 'rankList');
       wrap.appendChild(left);
 
       const right = document.createElement('div'); right.className='mmc-card';
@@ -589,6 +599,9 @@
 
       const renderList = ()=>{
         const q = (left.querySelector('.mmc-search')?.value || '').toLowerCase();
+        const scrollKey = (kind==='occupation' ? 'occupationList' : 'originList');
+        const st = list.scrollTop;
+        try{ this.state.scroll[scrollKey] = st; }catch(_){ }
         list.innerHTML='';
         src.filter(o=> keyOf(o).includes(q) || String(o.system?.description||'').toLowerCase().includes(q))
           .forEach(o=>{
@@ -601,6 +614,7 @@
           });
 
         list.querySelectorAll('[data-pick]').forEach(btn=>btn.addEventListener('click',(ev)=>{
+          try{ this.state.scroll[scrollKey] = list.scrollTop; }catch(_){ }
           const k = ev.currentTarget.dataset.pick;
           const obj = src.find(x=>keyOf(x)===k) ?? null;
           if (kind==='occupation') this.state.occupation=obj; else this.state.origin=obj;
@@ -608,9 +622,13 @@
           const cur = wrap.querySelector('.mmc-selected');
           if (cur) cur.innerHTML = html;
         }));
+
+        // Keep the list where the user was (important when filtering/searching)
+        try{ list.scrollTop = st; }catch(_){ }
       };
 
       renderList();
+      this._bindScrollMemory(list, kind==='occupation' ? 'occupationList' : 'originList');
       const sEl = left.querySelector('.mmc-search');
       if (sEl) sEl.addEventListener('input', ()=>renderList());
 
@@ -658,8 +676,18 @@
         };
         grantedTraits.forEach(t=>selWrap.appendChild(mkChip(`Traço: ${t.name}`, null, true)));
         grantedTags.forEach(t=>selWrap.appendChild(mkChip(`Tag: ${t.name}`, null, true)));
-        (this.state.selectedTraits||[]).forEach(t=> selWrap.appendChild(mkChip(`Traço: ${t.name}`, ()=>{ this.state.selectedTraits = (this.state.selectedTraits||[]).filter(x=>x._id!==t._id); this._refreshPowerChips(); } )));
-        (this.state.selectedTags||[]).forEach(t=> selWrap.appendChild(mkChip(`Tag: ${t.name}`, ()=>{ this.state.selectedTags = (this.state.selectedTags||[]).filter(x=>x._id!==t._id); this._refreshPowerChips(); } )));
+        (this.state.selectedTraits||[]).forEach(t=> selWrap.appendChild(mkChip(`Traço: ${t.name}`, ()=>{
+          try{ this.state.scroll.traits = listTraits.scrollTop; }catch(_){ }
+          try{ this.state.scroll.tags = listTags.scrollTop; }catch(_){ }
+          this.state.selectedTraits = (this.state.selectedTraits||[]).filter(x=>x._id!==t._id);
+          this._refreshPowerChips();
+        } )));
+        (this.state.selectedTags||[]).forEach(t=> selWrap.appendChild(mkChip(`Tag: ${t.name}`, ()=>{
+          try{ this.state.scroll.traits = listTraits.scrollTop; }catch(_){ }
+          try{ this.state.scroll.tags = listTags.scrollTop; }catch(_){ }
+          this.state.selectedTags = (this.state.selectedTags||[]).filter(x=>x._id!==t._id);
+          this._refreshPowerChips();
+        } )));
       };
 
       const renderList = (kind, listEl, data, q)=>{
@@ -689,6 +717,8 @@
           const id = ev.currentTarget.dataset.add;
           const it = data.find(x=>x._id===id);
           if (!it) return;
+          try{ this.state.scroll.traits = listTraits.scrollTop; }catch(_){ }
+          try{ this.state.scroll.tags = listTags.scrollTop; }catch(_){ }
           if (kind==='trait') this.state.selectedTraits = [...(this.state.selectedTraits||[]), it];
           else this.state.selectedTags = [...(this.state.selectedTags||[]), it];
           this._refreshPowerChips();
@@ -698,8 +728,8 @@
       renderSelected();
       renderList('trait', listTraits, traits, '');
       renderList('tag', listTags, tags, '');
-      this._restoreScroll(listTraits, 'traits');
-      this._restoreScroll(listTags, 'tags');
+      this._bindScrollMemory(listTraits, 'traits');
+      this._bindScrollMemory(listTags, 'tags');
 
       left.querySelector('input[name="search-traits"]').addEventListener('input', (ev)=>{
         this.state.scroll.traits = listTraits.scrollTop;
@@ -799,7 +829,7 @@
 
       listBasic.innerHTML='';
       allP.filter(p=>(p.system?.powerSet??'Basic')==='Basic').forEach(p=>listBasic.appendChild(buildRow(p)));
-      this._restoreScroll(listBasic, 'powers-basic');
+      this._bindScrollMemory(listBasic, 'powers-basic');
       _filterList(listBasic, q);
 
       // Set list: family-aware listing
@@ -811,7 +841,7 @@
       const crossList = (allP||[]).filter(p=>baseNames.has(_mmcBaseName(p?.name)));
       const shownList = MMCCharactermancer._mmcDedupPowersByNameAndSet(crossList);
       shownList.forEach(p=>listSet.appendChild(buildRow(p)));
-      this._restoreScroll(listSet, 'powers-set');
+      this._bindScrollMemory(listSet, 'powers-set');
 
       // Selected chips panel
       const selCard = document.createElement('div'); selCard.className='mmc-card';

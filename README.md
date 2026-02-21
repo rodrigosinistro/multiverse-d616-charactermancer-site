@@ -1,37 +1,63 @@
 # Multiverse D616 — Charactermancer (Site)
 
-Charactermancer web (estático) para o **Multiverse D616**: você monta o personagem com a mesma lógica/fluxo do charactermancer do Foundry e, ao final, **baixa o PDF (M616)**.
+Charactermancer **web (site estático)** para o **Multiverse D616**.
 
-- **Site (GitHub Pages):** abra o repositório publicado e acesse pela URL do Pages.
-- **Exportação de PDF:** usa **pdf-lib** e **FileSaver** via **CDN** (carregamento sob demanda).
-- **Templates do PDF:** ficam embutidos em `assets/templates/`.
+Ele replica o **fluxo** e o **layout** do charactermancer do Foundry (módulo `marvel-multiverse-charactermancer`) e, ao final, permite **exportar a ficha em PDF (M616)** usando a mesma base de templates/lógica do `sheet-export-m616`.
+
+## Site (GitHub Pages)
+
+- **URL esperada:** `https://rodrigosinistro.github.io/multiverse-d616-charactermancer-site/`
+  - Se você publicar em outro usuário/repositório, a URL muda de acordo.
 
 ## Como usar
 
-1. Escolha **Rank** e distribua os **atributos (M.A.R.V.E.L.)**.
-2. Selecione **Ocupação** e **Origem**.
-3. Escolha **Traços** e **Tags**.
-4. Selecione **Poderes** (respeitando pré-requisitos e limite do Rank).
-5. Em **Revisão**, preencha a **Biografia** e clique em **Baixar PDF (M616)**.
+1. **Rank & Atributos**: escolha o Rank e distribua os atributos (M.A.R.V.E.L.).
+2. **Ocupação** e **Origem**.
+3. **Traços & Tags**.
+4. **Poderes** (respeitando pré-requisitos e limite do Rank).
+5. **Revisão**: preencha a Biografia e clique em **Baixar PDF (M616)**.
 
-## Exportação / Importação
+### Exportar / Importar progresso
 
 Na etapa **Revisão**:
+
 - **Baixar JSON**: salva seu progresso.
 - **Importar JSON**: restaura seu progresso.
 - **Resetar Tudo**: volta ao estado inicial.
 
-## Estrutura
+## Publicar no GitHub Pages (sem build)
 
-- `index.html` — página do app
+Este projeto é **100% estático**. Para publicar:
+
+1. Faça commit/push na branch **`main`**.
+2. No GitHub, vá em **Settings → Pages**.
+3. Em **Build and deployment**:
+   - **Source:** *Deploy from a branch*
+   - **Branch:** `main`
+   - **Folder:** `/ (root)`
+4. Salve. O GitHub Pages servirá o `index.html` diretamente.
+
+> Observação: existe um arquivo `.nojekyll` para evitar que o Pages ignore pastas com `_` (padrão Jekyll).
+
+## PDF (M616)
+
+- **Templates embutidos:** `assets/templates/` (os PDFs-base ficam no repositório — não apontam para fora).
+- **Libs via CDN:** atualmente o export usa `pdf-lib` e `FileSaver` via CDN (carregamento no navegador).
+
+## Estrutura do projeto
+
+- `index.html` — app (SPA simples)
 - `styles/` — CSS do charactermancer
-- `data/` — JSONs (ocupações, origens, traços, tags, poderes, modelo de ator)
-- `assets/templates/` — PDFs-base (cores)
-- `js/mmc-site.js` — lógica do charactermancer (web port)
+- `data/` — JSONs (ocupações, origens, traços, tags, poderes, modelo do ator)
+- `assets/templates/` — templates do PDF (cores)
+- `js/mmc-site.js` — charactermancer (web port)
 - `js/m616-export.js` — exportação de PDF (web port)
 
-## Observações
+## Como reportar bugs
 
-- Este projeto é um **site estático**: não precisa de build.
-- Para publicar no GitHub Pages, basta habilitar Pages apontando para a branch/pasta raiz.
+Abra uma **Issue** no GitHub com:
 
+1. **Passo a passo** para reproduzir.
+2. **Print** (ou vídeo curto) do que aconteceu.
+3. Se possível, anexe um **JSON exportado** na etapa *Revisão* (ajuda muito a reproduzir o estado).
+4. Informe navegador e sistema (ex.: Chrome/Edge + Windows).
