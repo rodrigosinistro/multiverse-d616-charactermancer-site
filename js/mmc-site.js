@@ -1,12 +1,12 @@
 /* Multiverse D616 — Charactermancer Site
  * Web port based on the Foundry module: marvel-multiverse-charactermancer v0.1.3
- * Site version: v0.0.7
+ * Site version: v0.0.8
  */
 
 (function(){
   'use strict';
 
-  const SITE_VERSION = '0.0.7';
+  const SITE_VERSION = '0.0.8';
   const ROOT_ID = 'mmc-root';
 
   // ---------- Tiny "Foundry-like" stubs (to keep the original code structure) ----------
@@ -412,7 +412,8 @@
       await this._ensureData();
       const r = await super.render(force);
       try{ this._updateTip(); }catch(_){ }
-      
+      return r;
+    }
 
     _updateTip(){
       const el = document.getElementById('mmc-tip');
@@ -422,9 +423,6 @@
       } else {
         el.innerHTML = 'Dica: o PDF usa <code>pdf-lib</code> e <code>FileSaver</code> via CDN no momento.';
       }
-    }
-
-return r;
     }
 
     async _renderStep(){

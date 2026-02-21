@@ -18,14 +18,6 @@ Ele replica o **fluxo** e o **layout** do charactermancer do Foundry (módulo `m
 4. **Poderes** (respeitando pré-requisitos e limite do Rank).
 5. **Revisão**: preencha a Biografia e clique em **Baixar PDF (M616)**.
 
-### Exportar / Importar progresso
-
-Na etapa **Revisão** (barra inferior):
-
-- **Baixar JSON**: salva seu progresso.
-- **Importar JSON**: restaura seu progresso.
-- **Resetar Tudo**: volta ao estado inicial.
-
 ## Publicar no GitHub Pages (sem build)
 
 Este projeto é **100% estático**. Para publicar:
@@ -38,14 +30,21 @@ Este projeto é **100% estático**. Para publicar:
    - **Folder:** `/ (root)`
 4. Salve. O GitHub Pages servirá o `index.html` diretamente.
 
-> Observação: existe um arquivo `.nojekyll` para evitar que o Pages ignore pastas com `_` (padrão Jekyll).
+> Observação: existe um arquivo `.nojekyll` para evitar que o Pages trate o repositório como Jekyll.
 
 ## PDF (M616)
 
 - **Templates embutidos:** `assets/templates/` (os PDFs-base ficam no repositório — não apontam para fora).
 - **Libs via CDN:** atualmente o export usa `pdf-lib` e `FileSaver` via CDN (carregamento no navegador).
-- **Campos editáveis:** a **página principal** é gerada mantendo os **campos do template editáveis** (não é "flatten").
-- **Páginas extras (descrições):** são renderizadas como texto e usam **1 coluna** (sem layout em 2 colunas).
+- **Campos editáveis:** a **página principal** é gerada mantendo os **campos do template editáveis** (não é *flatten*).
+- **Páginas extras (descrições):** são renderizadas como texto e usam **1 coluna**.
+
+## JSON (Foundry VTT — Multiverse D616)
+
+- **Importar JSON (Passo 1):** aceita o **JSON de Actor exportado pelo Foundry VTT** usando o sistema **Multiverse D616**.
+- **Baixar JSON (Passo 6):** gera um **Actor JSON compatível** para você importar no Foundry (**Multiverse D616**).
+
+> Dica: se você exportar um personagem do Foundry (Actor → Export Data) e importar aqui, o site tenta mapear automaticamente Rank, Atributos, Bio, Ocupação/Origem, Traços/Tags e Poderes.
 
 ## Estrutura do projeto
 
@@ -62,14 +61,5 @@ Abra uma **Issue** no GitHub com:
 
 1. **Passo a passo** para reproduzir.
 2. **Print** (ou vídeo curto) do que aconteceu.
-3. Se possível, anexe um **JSON exportado** na etapa *Revisão* (ajuda muito a reproduzir o estado).
+3. Se possível, anexe um **JSON exportado** (do Foundry ou do site) para reproduzir o estado.
 4. Informe navegador e sistema (ex.: Chrome/Edge + Windows).
-
-
-## JSON (Foundry VTT)
-
-- **Importar JSON (Passo 1):** aceita o **JSON de Actor exportado pelo Foundry VTT** usando o sistema **Multiverse D616**.
-- **Baixar JSON (Passo 6):** gera um **Actor JSON compatível** para você importar no Foundry (**Multiverse D616**).
-
-> Dica: se você exportar um personagem do Foundry (Actor → Export Data) e importar aqui, o site tenta mapear automaticamente Rank, Atributos, Bio, Ocupação/Origem, Traços/Tags e Poderes.
-

@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.0.8
+
+- **Fix crítico:** corrigido um erro de sintaxe em `js/mmc-site.js` que impedia o app de renderizar no GitHub Pages (página ficava em branco).
+
 ## v0.0.7
 
 - **UI (Passo 1):** dica atualizada para: “Esse criador de personagem foi desenvolvido para ser utilizado no Foundry VTT e com o sistema Multiverse D616.”
