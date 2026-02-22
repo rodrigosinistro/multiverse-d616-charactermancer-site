@@ -1,6 +1,12 @@
 # Changelog
 
 
+## v0.0.16
+
+- **Fix (Foundry Import):** corrigida a exportação de **Power Sets com espaço no nome** (ex.: **Animal Control**).
+  - O sistema Multiverse-D616 deriva a chave do “bucket” do Power Set de forma sensível a espaços; ao exportar como `"Animal Control"`, a ficha podia tentar fazer `.push` em um bucket inexistente e quebrar (`Cannot read properties of undefined (reading 'push')`).
+  - A exportação agora grava `system.powerSet` como **PascalCase sem espaços** (ex.: `AnimalControl`, `ElementalControl`, `MeleeWeapons`, etc.), garantindo que o bucket derivado seja `animalControl`, `elementalControl`, `meleeWeapons`, etc.
+
 ## v0.0.15
 
 - **Dados do Foundry:** atualizados os arquivos da pasta `data/` com os JSONs exportados do Foundry (packs `items`, `occupations`, `origins`, `powers`, `traits`, `tags`).

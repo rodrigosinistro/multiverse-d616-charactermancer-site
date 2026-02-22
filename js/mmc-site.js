@@ -1,12 +1,12 @@
 /* Multiverse D616 — Charactermancer Site
  * Web port based on the Foundry module: marvel-multiverse-charactermancer v0.1.3
- * Site version: v0.0.10
+ * Site version: v0.0.16
  */
 
 (function(){
   'use strict';
 
-  const SITE_VERSION = '0.0.15';
+  const SITE_VERSION = '0.0.16';
   const ROOT_ID = 'mmc-root';
 
   // ---------- Tiny "Foundry-like" stubs (to keep the original code structure) ----------
@@ -1657,19 +1657,27 @@
         // Fallback: Title Case each word (helps with user/world power sets)
         return raw.split(' ').map(w=> w ? (w[0].toUpperCase()+w.slice(1)) : w).join(' ');
       };
-      const _powerSetKeyFromLabel = (label)=>{
-        const clean = String(label||'')
-          .replace(/[–—]/g,'-')
-          .trim();
-        if (!clean) return 'basic';
+      // IMPORTANT (Foundry import stability): the D616 sheet derives the bucket key by
+      // lowercasing the first character of the Power Set string (and otherwise keeping it).
+      // That means multi-word sets like "Animal Control" would derive to "animal Control"
+      // (with a space) and crash the sheet when it does .push on an undefined bucket.
+      // To match the system's expectations, export multi-word sets as PascalCase-without-spaces
+      // (e.g. "AnimalControl"). The bucket key then becomes "animalControl".
+      const _powerSetExportValue = (label)=>{
+        const clean = String(label||'').replace(/[–—]/g,'-').trim();
+        if (!clean) return 'Basic';
         const parts = clean
           .replace(/[^A-Za-z0-9\-\s]/g,'')
           .replace(/\-/g,' ')
           .split(/\s+/)
           .filter(Boolean);
-        if (!parts.length) return 'basic';
-        const [first, ...rest] = parts;
-        return first.toLowerCase() + rest.map(p=>p.charAt(0).toUpperCase()+p.slice(1)).join('');
+        if (!parts.length) return 'Basic';
+        return parts.map(p=> p.charAt(0).toUpperCase()+p.slice(1)).join('');
+      };
+      const _powerSetKeyFromExportValue = (exportVal)=>{
+        const v = String(exportVal||'').trim();
+        if (!v) return 'basic';
+        return v.charAt(0).toLowerCase() + v.slice(1);
       };
       try{
         base.system.powers = (base.system.powers && typeof base.system.powers === 'object') ? base.system.powers : {};
@@ -1682,8 +1690,9 @@
           if (it?.type !== 'power') continue;
           it.system = it.system || {};
           const label = _canonPowerSetLabel(it.system.powerSet || 'Basic');
-          it.system.powerSet = label;
-          const key = _powerSetKeyFromLabel(label);
+          const exportVal = _powerSetExportValue(label);
+          it.system.powerSet = exportVal;
+          const key = _powerSetKeyFromExportValue(exportVal);
           if (!Array.isArray(base.system.powers[key])) base.system.powers[key] = [];
         }
       }catch(_){ }

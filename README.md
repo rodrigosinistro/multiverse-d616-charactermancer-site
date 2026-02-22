@@ -47,6 +47,8 @@ Este projeto é **100% estático**. Para publicar:
 - **Importar JSON (Passo 1):** aceita o **JSON de Actor exportado pelo Foundry VTT** usando o sistema **Multiverse D616**.
 - **Baixar JSON (Passo 6):** gera um **Actor JSON compatível** para você importar no Foundry (**Multiverse D616**).
 
+> Nota: para evitar crash do sheet ao importar (ex.: Power Set **Animal Control**), a exportação normaliza `system.powerSet` dos itens do tipo `power` para **PascalCase sem espaços** (ex.: `AnimalControl`, `ElementalControl`, `MeleeWeapons`).
+
 > Dica: se você exportar um personagem do Foundry (Actor → Export Data) e importar aqui, o site tenta mapear automaticamente Rank, Atributos, Bio, Ocupação/Origem, Traços/Tags e Poderes.
 
 ## Estrutura do projeto
