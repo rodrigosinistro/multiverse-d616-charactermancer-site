@@ -1,5 +1,11 @@
 # Changelog
 
+
+## v0.0.15
+
+- **Dados do Foundry:** atualizados os arquivos da pasta `data/` com os JSONs exportados do Foundry (packs `items`, `occupations`, `origins`, `powers`, `traits`, `tags`).
+  - Isso atualiza o catálogo usado pelo site (listas, pré-requisitos, efeitos e textos) para refletir seus dados mais recentes.
+
 ## v0.0.14
 
 - **JSON (Foundry / Multiverse D616):** corrigida a exportação para evitar crash ao abrir a ficha no Foundry (`Cannot read properties of undefined (reading 'push')`).

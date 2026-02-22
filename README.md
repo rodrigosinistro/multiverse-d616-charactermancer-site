@@ -58,6 +58,12 @@ Este projeto é **100% estático**. Para publicar:
 - `js/mmc-site.js` — charactermancer (web port)
 - `js/m616-export.js` — exportação de PDF (web port)
 
+## Atualizar os catálogos (dados do Foundry)
+
+Se você atualizar os compêndios no Foundry, basta substituir os arquivos JSON em `data/` (por exemplo `powers.json`, `traits.json`, `tags.json`, `occupations.json`, `origins.json` e `items.json`) por novas exportações.
+
+> Importante: os templates de PDF devem permanecer em `assets/templates/` e não podem apontar para fora.
+
 ## Como reportar bugs
 
 Abra uma **Issue** no GitHub com:
