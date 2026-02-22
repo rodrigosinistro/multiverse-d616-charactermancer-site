@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.0.11
+
+- **PDF (M616):** corrigida a preparação dos dados para **Non-Combat Checks** e **DAMAGE**, alinhando com o comportamento do sistema **Multiverse D616 no Foundry**:
+  - **Non-Combat Checks** agora exporta o **modificador total** (Ability + bônus de itens/efeitos).
+  - **DAMAGE** agora garante **multiplicador mínimo 1** e aplica corretamente os bônus de **ActiveEffects**.
+  - Se algum efeito alterar o **Ability Score**, os totais derivados (Defense/Non-Combat) são mantidos em sincronia.
+
 ## v0.0.10
 
 - **UI (Passo 5 — Poderes):** o campo **Buscar...** agora **mantém o texto digitado** entre re-renderizações e o filtro não “gruda” com o input vazio.

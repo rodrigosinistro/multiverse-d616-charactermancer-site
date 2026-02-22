@@ -6,7 +6,7 @@
 (function(){
   'use strict';
 
-  const SITE_VERSION = '0.0.10';
+  const SITE_VERSION = '0.0.11';
   const ROOT_ID = 'mmc-root';
 
   // ---------- Tiny "Foundry-like" stubs (to keep the original code structure) ----------

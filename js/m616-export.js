@@ -96,24 +96,27 @@
     const keys = ['mle','agl','res','vig','ego','log'];
 
     // If the actor came from a raw JSON export, many derived fields will be 0.
-    // Defense score on the sheet is never below 10, and damage multipliers are never below 1.
+    // Defense score is never below 10, damage multipliers are never below 1.
+    // In Multiverse-D616 FVTT, non-combat checks are stored as the TOTAL modifier (ability value + bonuses).
     const dmgKeys = new Set(['mle','agl','ego','log']);
     const needs = keys.some(k => {
       const a = sys.abilities?.[k] || {};
+      const v = Number(a.value||0);
       const needsDefense = (a.defense == null) || Number(a.defense||0) < 10;
+      const needsNoncom = (a.noncom == null) || (Number(a.noncom||0) === 0 && v !== 0);
       const needsMult = dmgKeys.has(k) ? ((a.damageMultiplier == null) || Number(a.damageMultiplier||0) < 1) : false;
-      return needsDefense || needsMult;
+      return needsDefense || needsNoncom || needsMult;
     });
     if (!needs) return sys;
 
-    // Base derived values
+    // Base derived values (match Multiverse-D616 FVTT behavior)
+    // - Defense score shown on the sheet is TOTAL: 10 + ability value (+ any bonuses via effects)
+    // - Non-combat checks shown on the sheet is TOTAL: ability value (+ any bonuses via effects)
     for (const k of keys){
       sys.abilities[k] = sys.abilities[k] || {};
       const val = Number(sys.abilities[k].value || 0);
-      // Defense score on the sheet is TOTAL (10 + ability + bonuses)
       sys.abilities[k].defense = 10 + val;
-      // Non-combat checks are BONUS modifiers (do not include the ability score)
-      sys.abilities[k].noncom = Number(sys.abilities[k].noncom || 0);
+      sys.abilities[k].noncom = val;
     }
     // Damage multiplier base (dMarvel x Multiplier + Ability)
     for (const k of ['mle','agl','ego','log']){
@@ -135,9 +138,37 @@
         if (ef?.disabled) continue;
         if (ef?.transfer === false) continue;
         for (const ch of Array.from(ef?.changes || [])){
-          applyChange(sys, ch?.key, ch?.mode, ch?.value);
+          // If an effect changes an ability value, keep the derived totals in sync.
+          const keyPath = String(ch?.key||'');
+          const m = keyPath.match(/^system\.abilities\.(mle|agl|res|vig|ego|log)\.value$/);
+          if (m){
+            const ab = m[1];
+            const before = Number(get(sys, `abilities.${ab}.value`) || 0);
+            applyChange(sys, ch?.key, ch?.mode, ch?.value);
+            const after = Number(get(sys, `abilities.${ab}.value`) || 0);
+            const delta = after - before;
+            if (delta){
+              setByPath(sys, `abilities.${ab}.defense`, Number(get(sys,`abilities.${ab}.defense`)||0) + delta);
+              setByPath(sys, `abilities.${ab}.noncom`,  Number(get(sys,`abilities.${ab}.noncom`)||0) + delta);
+            }
+          } else {
+            applyChange(sys, ch?.key, ch?.mode, ch?.value);
+          }
         }
       }
+    }
+
+    // Sanity clamps
+    for (const k of keys){
+      const v = Number(get(sys, `abilities.${k}.value`) || 0);
+      const d = Number(get(sys, `abilities.${k}.defense`) || (10+v));
+      if (d < 10) setByPath(sys, `abilities.${k}.defense`, 10 + v);
+      const nc = Number(get(sys, `abilities.${k}.noncom`) || v);
+      setByPath(sys, `abilities.${k}.noncom`, nc);
+    }
+    for (const k of ['mle','agl','ego','log']){
+      const dm = Number(get(sys, `abilities.${k}.damageMultiplier`) || 0);
+      if (dm < 1) setByPath(sys, `abilities.${k}.damageMultiplier`, 1);
     }
 
     // Keep current = max after max-modifying effects (common expectation when exporting a fresh sheet)
