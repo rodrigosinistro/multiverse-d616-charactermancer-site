@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.0.12
+
+- **PDF (M616) — DAMAGE:** corrigida a regra do **Multiplicador de Dano** para bater com o sistema **Multiverse D616**: agora o multiplicador base é **igual ao Rank do personagem** e depois recebe os **modificadores** dos itens (ActiveEffects).
+  - Ex.: Rank 3 + Mighty 1 (+1 Melee Multiplier) → **Melee Multiplier = 4**.
+
+
 ## v0.0.11
 
 - **PDF (M616):** corrigida a preparação dos dados para **Non-Combat Checks** e **DAMAGE**, alinhando com o comportamento do sistema **Multiverse D616 no Foundry**:

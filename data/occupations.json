@@ -3,16 +3,16 @@
   "metadata": {
     "name": "occupations",
     "label": "Occupations",
-    "path": "worlds/marvel-multiverse/packs/occupations",
+    "path": "worlds/no-more-mutants/packs/occupations",
     "type": "Item",
-    "system": "marvel-multiverse",
+    "system": "multiverse-d616",
     "ownership": {
       "PLAYER": "OBSERVER",
       "ASSISTANT": "OWNER"
     },
     "flags": {},
     "packageType": "world",
-    "packageName": "marvel-multiverse",
+    "packageName": "no-more-mutants",
     "id": "world.occupations"
   },
   "type": "Item",
@@ -70,17 +70,26 @@
         "attack": false,
         "formula": "{1d6,1dm,1d6}"
       },
-      "flags": {},
+      "flags": {
+        "scene-packer": {
+          "hash": "0a17c7144457939fe3052d746b9987ae29d72333",
+          "sourceId": "Compendium.world.occupations.Item.1STSVGcSdbeSMNx6"
+        }
+      },
       "effects": [],
       "_stats": {
-        "coreVersion": "13.346",
+        "coreVersion": "13.351",
         "systemId": "marvel-multiverse",
         "systemVersion": "2.2.0",
-        "createdTime": 1756480162389,
-        "modifiedTime": 1756483559288,
-        "lastModifiedBy": "7HEATldsEyjiaswS"
+        "createdTime": 1768186837548,
+        "modifiedTime": 1768186837548,
+        "lastModifiedBy": "KoOOm4SONUteoNDL"
       },
+      "sort": 0,
       "folder": null,
+      "ownership": {
+        "default": 0
+      },
       "_id": "1STSVGcSdbeSMNx6"
     },
     {
@@ -131,17 +140,26 @@
         "formula": "{1d6,1dm,1d6}",
         "tags": []
       },
-      "flags": {},
+      "flags": {
+        "scene-packer": {
+          "hash": "5be2bbb52e281aef80bfe57113d99f144398d8b5",
+          "sourceId": "Compendium.world.occupations.Item.1Y5Lr8dDiMFzSwPO"
+        }
+      },
       "effects": [],
       "_stats": {
-        "coreVersion": "13.346",
+        "coreVersion": "13.351",
         "systemId": "marvel-multiverse",
         "systemVersion": "2.2.0",
-        "createdTime": 1756480162389,
-        "modifiedTime": 1756480162389,
-        "lastModifiedBy": "7HEATldsEyjiaswS"
+        "createdTime": 1768186837548,
+        "modifiedTime": 1768186837548,
+        "lastModifiedBy": "KoOOm4SONUteoNDL"
       },
+      "sort": 0,
       "folder": null,
+      "ownership": {
+        "default": 0
+      },
       "_id": "1Y5Lr8dDiMFzSwPO"
     },
     {
@@ -224,17 +242,26 @@
         "examples": "",
         "tags": []
       },
-      "flags": {},
+      "flags": {
+        "scene-packer": {
+          "hash": "dac00240fd8eaa605f35ce6f6bff1b0fc7d559c4",
+          "sourceId": "Compendium.world.occupations.Item.4gibd6cFrOtcvLeq"
+        }
+      },
       "effects": [],
       "_stats": {
-        "coreVersion": "13.346",
+        "coreVersion": "13.351",
         "systemId": "marvel-multiverse",
         "systemVersion": "2.2.0",
-        "createdTime": 1756480162389,
-        "modifiedTime": 1756483575120,
-        "lastModifiedBy": "7HEATldsEyjiaswS"
+        "createdTime": 1768186837548,
+        "modifiedTime": 1768186837548,
+        "lastModifiedBy": "KoOOm4SONUteoNDL"
       },
+      "sort": 0,
       "folder": null,
+      "ownership": {
+        "default": 0
+      },
       "_id": "4gibd6cFrOtcvLeq"
     },
     {
@@ -291,17 +318,26 @@
         "attack": false,
         "formula": "{1d6,1dm,1d6}"
       },
-      "flags": {},
+      "flags": {
+        "scene-packer": {
+          "hash": "60cf966c0d7c0450eb96cc74772936f8699c46dc",
+          "sourceId": "Compendium.world.occupations.Item.BwSPq35eiRRhfTAi"
+        }
+      },
       "effects": [],
       "_stats": {
-        "coreVersion": "13.346",
+        "coreVersion": "13.351",
         "systemId": "marvel-multiverse",
         "systemVersion": "2.2.0",
-        "createdTime": 1756480162389,
-        "modifiedTime": 1756483561903,
-        "lastModifiedBy": "7HEATldsEyjiaswS"
+        "createdTime": 1768186837548,
+        "modifiedTime": 1768186837548,
+        "lastModifiedBy": "KoOOm4SONUteoNDL"
       },
+      "sort": 0,
       "folder": null,
+      "ownership": {
+        "default": 0
+      },
       "_id": "BwSPq35eiRRhfTAi"
     },
     {
@@ -356,17 +392,26 @@
         "formula": "{1d6,1dm,1d6}",
         "tags": []
       },
-      "flags": {},
+      "flags": {
+        "scene-packer": {
+          "hash": "1a2dbfe26a57df2f5293f91783c5c3c7ae3285e2",
+          "sourceId": "Compendium.world.occupations.Item.CS3grYXkyhEsXa8W"
+        }
+      },
       "effects": [],
       "_stats": {
-        "coreVersion": "13.346",
+        "coreVersion": "13.351",
         "systemId": "marvel-multiverse",
         "systemVersion": "2.2.0",
-        "createdTime": 1756480162389,
-        "modifiedTime": 1756480162389,
-        "lastModifiedBy": "7HEATldsEyjiaswS"
+        "createdTime": 1768186837548,
+        "modifiedTime": 1768186837548,
+        "lastModifiedBy": "KoOOm4SONUteoNDL"
       },
+      "sort": 0,
       "folder": null,
+      "ownership": {
+        "default": 0
+      },
       "_id": "CS3grYXkyhEsXa8W"
     },
     {
@@ -423,17 +468,26 @@
         "attack": false,
         "formula": "{1d6,1dm,1d6}"
       },
-      "flags": {},
+      "flags": {
+        "scene-packer": {
+          "hash": "ab16c80b14e38c1ba75f5078a6747f5e01dd9f95",
+          "sourceId": "Compendium.world.occupations.Item.GjNdUjutIj2toI1n"
+        }
+      },
       "effects": [],
       "_stats": {
-        "coreVersion": "13.346",
+        "coreVersion": "13.351",
         "systemId": "marvel-multiverse",
         "systemVersion": "2.2.0",
-        "createdTime": 1756480162389,
-        "modifiedTime": 1756483593880,
-        "lastModifiedBy": "7HEATldsEyjiaswS"
+        "createdTime": 1768186837548,
+        "modifiedTime": 1768186837548,
+        "lastModifiedBy": "KoOOm4SONUteoNDL"
       },
+      "sort": 0,
       "folder": null,
+      "ownership": {
+        "default": 0
+      },
       "_id": "GjNdUjutIj2toI1n"
     },
     {
@@ -487,17 +541,26 @@
         "attack": false,
         "formula": "{1d6,1dm,1d6}"
       },
-      "flags": {},
+      "flags": {
+        "scene-packer": {
+          "hash": "cb357bcb417d393a2960a06e2ef761e9f2aceb94",
+          "sourceId": "Compendium.world.occupations.Item.Hnyaqj2Ki7Q4KVNb"
+        }
+      },
       "effects": [],
       "_stats": {
-        "coreVersion": "13.346",
+        "coreVersion": "13.351",
         "systemId": "marvel-multiverse",
         "systemVersion": "2.2.0",
-        "createdTime": 1756480162389,
-        "modifiedTime": 1756483571450,
-        "lastModifiedBy": "7HEATldsEyjiaswS"
+        "createdTime": 1768186837548,
+        "modifiedTime": 1768186837548,
+        "lastModifiedBy": "KoOOm4SONUteoNDL"
       },
+      "sort": 0,
       "folder": null,
+      "ownership": {
+        "default": 0
+      },
       "_id": "Hnyaqj2Ki7Q4KVNb"
     },
     {
@@ -552,17 +615,26 @@
         "formula": "{1d6,1dm,1d6}",
         "tags": []
       },
-      "flags": {},
+      "flags": {
+        "scene-packer": {
+          "hash": "c105b2bbe0c650cbe3f3be4ef7558a3172baa3b6",
+          "sourceId": "Compendium.world.occupations.Item.IiCeEPSWlmGDXZXZ"
+        }
+      },
       "effects": [],
       "_stats": {
-        "coreVersion": "13.346",
+        "coreVersion": "13.351",
         "systemId": "marvel-multiverse",
         "systemVersion": "2.2.0",
-        "createdTime": 1756480162389,
-        "modifiedTime": 1756480162389,
-        "lastModifiedBy": "7HEATldsEyjiaswS"
+        "createdTime": 1768186837548,
+        "modifiedTime": 1768186837548,
+        "lastModifiedBy": "KoOOm4SONUteoNDL"
       },
+      "sort": 0,
       "folder": null,
+      "ownership": {
+        "default": 0
+      },
       "_id": "IiCeEPSWlmGDXZXZ"
     },
     {
@@ -619,17 +691,26 @@
         "attack": false,
         "formula": "{1d6,1dm,1d6}"
       },
-      "flags": {},
+      "flags": {
+        "scene-packer": {
+          "hash": "e2761ab38fdc8663986be006eec00f17abc69af3",
+          "sourceId": "Compendium.world.occupations.Item.LQftHVqNSojGjIoE"
+        }
+      },
       "effects": [],
       "_stats": {
-        "coreVersion": "13.346",
+        "coreVersion": "13.351",
         "systemId": "marvel-multiverse",
         "systemVersion": "2.2.0",
-        "createdTime": 1756480162389,
-        "modifiedTime": 1756483582903,
-        "lastModifiedBy": "7HEATldsEyjiaswS"
+        "createdTime": 1768186837548,
+        "modifiedTime": 1768186837548,
+        "lastModifiedBy": "KoOOm4SONUteoNDL"
       },
+      "sort": 0,
       "folder": null,
+      "ownership": {
+        "default": 0
+      },
       "_id": "LQftHVqNSojGjIoE"
     },
     {
@@ -684,17 +765,26 @@
         "examples": "",
         "tags": []
       },
-      "flags": {},
+      "flags": {
+        "scene-packer": {
+          "hash": "7c22225092054a51eddb94bbf607c30decd84622",
+          "sourceId": "Compendium.world.occupations.Item.N9jAuPT6x5H1SfpU"
+        }
+      },
       "effects": [],
       "_stats": {
-        "coreVersion": "13.346",
+        "coreVersion": "13.351",
         "systemId": "marvel-multiverse",
         "systemVersion": "2.2.0",
-        "createdTime": 1756480162389,
-        "modifiedTime": 1756483542687,
-        "lastModifiedBy": "7HEATldsEyjiaswS"
+        "createdTime": 1768186837548,
+        "modifiedTime": 1768186837548,
+        "lastModifiedBy": "KoOOm4SONUteoNDL"
       },
+      "sort": 0,
       "folder": null,
+      "ownership": {
+        "default": 0
+      },
       "_id": "N9jAuPT6x5H1SfpU"
     },
     {
@@ -750,17 +840,26 @@
         "attack": false,
         "formula": "{1d6,1dm,1d6}"
       },
-      "flags": {},
+      "flags": {
+        "scene-packer": {
+          "hash": "b8c5865ec46d5bc6a03ae0d76a5fe72d2a53c193",
+          "sourceId": "Compendium.world.occupations.Item.NIAIgfHjWjlqLsF8"
+        }
+      },
       "effects": [],
       "_stats": {
-        "coreVersion": "13.346",
+        "coreVersion": "13.351",
         "systemId": "marvel-multiverse",
         "systemVersion": "2.2.0",
-        "createdTime": 1756480162389,
-        "modifiedTime": 1756480162389,
-        "lastModifiedBy": "7HEATldsEyjiaswS"
+        "createdTime": 1768186837548,
+        "modifiedTime": 1768186837548,
+        "lastModifiedBy": "KoOOm4SONUteoNDL"
       },
+      "sort": 0,
       "folder": null,
+      "ownership": {
+        "default": 0
+      },
       "_id": "NIAIgfHjWjlqLsF8"
     },
     {
@@ -817,17 +916,26 @@
         "attack": false,
         "formula": "{1d6,1dm,1d6}"
       },
-      "flags": {},
+      "flags": {
+        "scene-packer": {
+          "hash": "7dc353df7c4de4af2318af9cd3d554c77ba1935f",
+          "sourceId": "Compendium.world.occupations.Item.NT1q7oY8c9RhBMsA"
+        }
+      },
       "effects": [],
       "_stats": {
-        "coreVersion": "13.346",
+        "coreVersion": "13.351",
         "systemId": "marvel-multiverse",
         "systemVersion": "2.2.0",
-        "createdTime": 1756480162389,
-        "modifiedTime": 1756480162389,
-        "lastModifiedBy": "7HEATldsEyjiaswS"
+        "createdTime": 1768186837548,
+        "modifiedTime": 1768186837548,
+        "lastModifiedBy": "KoOOm4SONUteoNDL"
       },
+      "sort": 0,
       "folder": null,
+      "ownership": {
+        "default": 0
+      },
       "_id": "NT1q7oY8c9RhBMsA"
     },
     {
@@ -869,17 +977,26 @@
         "formula": "{1d6,1dm,1d6}",
         "tags": []
       },
-      "flags": {},
+      "flags": {
+        "scene-packer": {
+          "hash": "90214a9452dcade050ecde8e730c09cbfe4fcd81",
+          "sourceId": "Compendium.world.occupations.Item.UoP7BewebClZwREz"
+        }
+      },
       "effects": [],
       "_stats": {
-        "coreVersion": "13.346",
+        "coreVersion": "13.351",
         "systemId": "marvel-multiverse",
         "systemVersion": "2.2.0",
-        "createdTime": 1756480162389,
-        "modifiedTime": 1756480162389,
-        "lastModifiedBy": "7HEATldsEyjiaswS"
+        "createdTime": 1768186837548,
+        "modifiedTime": 1768186837548,
+        "lastModifiedBy": "KoOOm4SONUteoNDL"
       },
+      "sort": 0,
       "folder": null,
+      "ownership": {
+        "default": 0
+      },
       "_id": "UoP7BewebClZwREz"
     },
     {
@@ -933,17 +1050,26 @@
         "attack": false,
         "formula": "{1d6,1dm,1d6}"
       },
-      "flags": {},
+      "flags": {
+        "scene-packer": {
+          "hash": "5194b7aa0249fd4df1e1302eea2996ff468a824a",
+          "sourceId": "Compendium.world.occupations.Item.V6eDb5ae5Dv5XJ6o"
+        }
+      },
       "effects": [],
       "_stats": {
-        "coreVersion": "13.346",
+        "coreVersion": "13.351",
         "systemId": "marvel-multiverse",
         "systemVersion": "2.2.0",
-        "createdTime": 1756480162389,
-        "modifiedTime": 1756483582404,
-        "lastModifiedBy": "7HEATldsEyjiaswS"
+        "createdTime": 1768186837548,
+        "modifiedTime": 1768186837548,
+        "lastModifiedBy": "KoOOm4SONUteoNDL"
       },
+      "sort": 0,
       "folder": null,
+      "ownership": {
+        "default": 0
+      },
       "_id": "V6eDb5ae5Dv5XJ6o"
     },
     {
@@ -999,17 +1125,26 @@
         "attack": false,
         "formula": "{1d6,1dm,1d6}"
       },
-      "flags": {},
+      "flags": {
+        "scene-packer": {
+          "hash": "13966c1f710ae0190524c9ccf6ccc8dba3ac493e",
+          "sourceId": "Compendium.world.occupations.Item.dI954QVUcbCiU4bG"
+        }
+      },
       "effects": [],
       "_stats": {
-        "coreVersion": "13.346",
+        "coreVersion": "13.351",
         "systemId": "marvel-multiverse",
         "systemVersion": "2.2.0",
-        "createdTime": 1756480162389,
-        "modifiedTime": 1756483567229,
-        "lastModifiedBy": "7HEATldsEyjiaswS"
+        "createdTime": 1768186837548,
+        "modifiedTime": 1768186837548,
+        "lastModifiedBy": "KoOOm4SONUteoNDL"
       },
+      "sort": 0,
       "folder": null,
+      "ownership": {
+        "default": 0
+      },
       "_id": "dI954QVUcbCiU4bG"
     },
     {
@@ -1078,17 +1213,26 @@
         "attack": false,
         "formula": "{1d6,1dm,1d6}"
       },
-      "flags": {},
+      "flags": {
+        "scene-packer": {
+          "hash": "0ed4b1b2e5d1a26269d279ab85049137dcfaab6a",
+          "sourceId": "Compendium.world.occupations.Item.e72f1NrlBWR1BNsF"
+        }
+      },
       "effects": [],
       "_stats": {
-        "coreVersion": "13.346",
+        "coreVersion": "13.351",
         "systemId": "marvel-multiverse",
         "systemVersion": "2.2.0",
-        "createdTime": 1756480162389,
-        "modifiedTime": 1756483581893,
-        "lastModifiedBy": "7HEATldsEyjiaswS"
+        "createdTime": 1768186837548,
+        "modifiedTime": 1768186837548,
+        "lastModifiedBy": "KoOOm4SONUteoNDL"
       },
+      "sort": 0,
       "folder": null,
+      "ownership": {
+        "default": 0
+      },
       "_id": "e72f1NrlBWR1BNsF"
     },
     {
@@ -1143,17 +1287,26 @@
         "formula": "{1d6,1dm,1d6}",
         "tags": []
       },
-      "flags": {},
+      "flags": {
+        "scene-packer": {
+          "hash": "d777cc449f2c8a2a91d535ef0c799bdfdf176a40",
+          "sourceId": "Compendium.world.occupations.Item.v5Q1Gp1YKOHx01vk"
+        }
+      },
       "effects": [],
       "_stats": {
-        "coreVersion": "13.346",
+        "coreVersion": "13.351",
         "systemId": "marvel-multiverse",
         "systemVersion": "2.2.0",
-        "createdTime": 1756480162389,
-        "modifiedTime": 1756480162389,
-        "lastModifiedBy": "7HEATldsEyjiaswS"
+        "createdTime": 1768186837548,
+        "modifiedTime": 1768186837548,
+        "lastModifiedBy": "KoOOm4SONUteoNDL"
       },
+      "sort": 0,
       "folder": null,
+      "ownership": {
+        "default": 0
+      },
       "_id": "v5Q1Gp1YKOHx01vk"
     },
     {
@@ -1161,7 +1314,7 @@
       "type": "occupation",
       "img": "systems/marvel-multiverse/icons/work.svg",
       "system": {
-        "description": "The character is a hired killer. They might tell themselves that this is for the greater good. They might be picky about who they take on as clients or targets, but the core of their occupation is ending lives.",
+        "description": "<p>O personagem é um assassino de aluguel. Ele pode até se convencer de que está agindo para o bem maior. Pode ser seletivo quanto a quem aceita como clientes ou alvos, mas a essência de sua profissão é tirar vidas.</p>",
         "examples": "Arcade, Bullseye, Elektra, the Punisher.",
         "tags": [
           {
@@ -1223,31 +1376,40 @@
         "attack": false,
         "formula": "{1d6,1dm,1d6}"
       },
-      "flags": {},
+      "flags": {
+        "scene-packer": {
+          "hash": "10caf7b760313beaf63b743fc6087fb20558e357",
+          "sourceId": "Compendium.world.occupations.Item.z4vLSY6NsDC11AoE"
+        }
+      },
       "effects": [],
       "_stats": {
-        "coreVersion": "13.346",
-        "systemId": "marvel-multiverse",
-        "systemVersion": "2.2.0",
-        "createdTime": 1756480162389,
-        "modifiedTime": 1756480162389,
-        "lastModifiedBy": "7HEATldsEyjiaswS"
+        "coreVersion": "13.351",
+        "systemId": "multiverse-d616",
+        "systemVersion": "0.1.15",
+        "createdTime": 1768186837548,
+        "modifiedTime": 1768948556251,
+        "lastModifiedBy": "KoOOm4SONUteoNDL"
       },
+      "sort": 0,
       "folder": null,
+      "ownership": {
+        "default": 0
+      },
       "_id": "z4vLSY6NsDC11AoE"
     }
   ],
   "source": {
-    "world": "marvel-multiverse",
-    "system": "marvel-multiverse",
+    "world": "no-more-mutants",
+    "system": "multiverse-d616",
     "version": {
-      "core": "13.346",
-      "system": "2.2.0"
+      "core": "13.351",
+      "system": "0.1.51"
     }
   },
   "folders": [],
   "folder": {
-    "id": "GMJbBokUYDgVYTCs",
-    "name": "Marvel Multiverse"
+    "id": "XvnhPB9rC63LDacb",
+    "name": "Universo 716"
   }
 }

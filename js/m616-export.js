@@ -94,9 +94,11 @@
     sys.attributes = sys.attributes || {};
     sys.abilities = sys.abilities || {};
     const keys = ['mle','agl','res','vig','ego','log'];
+    // In Multiverse-D616, base DAMAGE multiplier equals the actor Rank.
+    const rankVal = Number(nvl3(get(sys,'attributes.rank.value'), get(sys,'attributes.rank.max'), get(sys,'rank'))) || 1;
 
     // If the actor came from a raw JSON export, many derived fields will be 0.
-    // Defense score is never below 10, damage multipliers are never below 1.
+    // Defense score is never below 10. Base DAMAGE multiplier equals Rank (then receives modifiers).
     // In Multiverse-D616 FVTT, non-combat checks are stored as the TOTAL modifier (ability value + bonuses).
     const dmgKeys = new Set(['mle','agl','ego','log']);
     const needs = keys.some(k => {
@@ -104,7 +106,7 @@
       const v = Number(a.value||0);
       const needsDefense = (a.defense == null) || Number(a.defense||0) < 10;
       const needsNoncom = (a.noncom == null) || (Number(a.noncom||0) === 0 && v !== 0);
-      const needsMult = dmgKeys.has(k) ? ((a.damageMultiplier == null) || Number(a.damageMultiplier||0) < 1) : false;
+      const needsMult = dmgKeys.has(k) ? ((a.damageMultiplier == null) || Number(a.damageMultiplier||0) < rankVal) : false;
       return needsDefense || needsNoncom || needsMult;
     });
     if (!needs) return sys;
@@ -119,8 +121,12 @@
       sys.abilities[k].noncom = val;
     }
     // Damage multiplier base (dMarvel x Multiplier + Ability)
+    // Rule: Multiplier = Rank + modifiers.
     for (const k of ['mle','agl','ego','log']){
-      sys.abilities[k].damageMultiplier = Math.max(1, Number(sys.abilities[k].damageMultiplier || 0));
+      sys.abilities[k] = sys.abilities[k] || {};
+      let dm = Number(sys.abilities[k].damageMultiplier);
+      if (!Number.isFinite(dm) || dm === 0) dm = rankVal;
+      sys.abilities[k].damageMultiplier = dm;
     }
 
     // Initiative base (most common rule in Multiverse sheets): Agility + Vigilance
@@ -167,8 +173,10 @@
       setByPath(sys, `abilities.${k}.noncom`, nc);
     }
     for (const k of ['mle','agl','ego','log']){
-      const dm = Number(get(sys, `abilities.${k}.damageMultiplier`) || 0);
-      if (dm < 1) setByPath(sys, `abilities.${k}.damageMultiplier`, 1);
+      let dm = Number(get(sys, `abilities.${k}.damageMultiplier`));
+      if (!Number.isFinite(dm)) dm = rankVal;
+      if (dm < 0) dm = 0;
+      setByPath(sys, `abilities.${k}.damageMultiplier`, dm);
     }
 
     // Keep current = max after max-modifying effects (common expectation when exporting a fresh sheet)
