@@ -47,6 +47,107 @@
   function abilityDefense(val){ return String(10 + (Number(val)||0)); }
   function fmtSigned(v){ const n=Number(v); if(isNaN(n)) return v??''; return n>=0?`+${n}`:`${n}`; }
 
+  // Apply Foundry-like ActiveEffect changes (minimal subset) so exports match what the FVTT system would prepare.
+  function deepClone(obj){
+    try{ return structuredClone(obj); }catch(_){ return JSON.parse(JSON.stringify(obj ?? {})); }
+  }
+  function parseEffectValue(v){
+    if (v === null || v === undefined) return 0;
+    const s = String(v).trim();
+    if (s === 'true') return true;
+    if (s === 'false') return false;
+    const n = Number(s);
+    if (!Number.isNaN(n)) return n;
+    return s;
+  }
+  function setByPath(obj, path, value){
+    const parts = String(path||'').split('.').filter(Boolean);
+    if (!parts.length) return;
+    let o = obj;
+    for (let i=0;i<parts.length-1;i++){
+      const p = parts[i];
+      if (o[p] == null || typeof o[p] !== 'object') o[p] = {};
+      o = o[p];
+    }
+    o[parts[parts.length-1]] = value;
+  }
+  function applyChange(root, key, mode, value){
+    const path = String(key||'').startsWith('system.') ? String(key).slice(7) : String(key||'');
+    if (!path) return;
+    const cur = get(root, path);
+    const v = parseEffectValue(value);
+    // Foundry modes: 1 MULTIPLY, 2 ADD, 5 OVERRIDE
+    if (mode === 2){
+      const a = Number(cur)||0;
+      const b = (typeof v === 'number') ? v : Number(v)||0;
+      setByPath(root, path, a + b);
+    } else if (mode === 1){
+      const a = Number(cur)||0;
+      const b = (typeof v === 'number') ? v : Number(v)||1;
+      setByPath(root, path, a * b);
+    } else if (mode === 5 || mode === 0){
+      setByPath(root, path, v);
+    }
+  }
+  function computePreparedSystem(sysRaw, items){
+    const sys = deepClone(sysRaw || {});
+    sys.attributes = sys.attributes || {};
+    sys.abilities = sys.abilities || {};
+    const keys = ['mle','agl','res','vig','ego','log'];
+
+    // If the actor came from a raw JSON export, many derived fields will be 0.
+    // Defense score on the sheet is never below 10, and damage multipliers are never below 1.
+    const dmgKeys = new Set(['mle','agl','ego','log']);
+    const needs = keys.some(k => {
+      const a = sys.abilities?.[k] || {};
+      const needsDefense = (a.defense == null) || Number(a.defense||0) < 10;
+      const needsMult = dmgKeys.has(k) ? ((a.damageMultiplier == null) || Number(a.damageMultiplier||0) < 1) : false;
+      return needsDefense || needsMult;
+    });
+    if (!needs) return sys;
+
+    // Base derived values
+    for (const k of keys){
+      sys.abilities[k] = sys.abilities[k] || {};
+      const val = Number(sys.abilities[k].value || 0);
+      // Defense score on the sheet is TOTAL (10 + ability + bonuses)
+      sys.abilities[k].defense = 10 + val;
+      // Non-combat checks are BONUS modifiers (do not include the ability score)
+      sys.abilities[k].noncom = Number(sys.abilities[k].noncom || 0);
+    }
+    // Damage multiplier base (dMarvel x Multiplier + Ability)
+    for (const k of ['mle','agl','ego','log']){
+      sys.abilities[k].damageMultiplier = Math.max(1, Number(sys.abilities[k].damageMultiplier || 0));
+    }
+
+    // Initiative base (most common rule in Multiverse sheets): Agility + Vigilance
+    if (sys.attributes?.init){
+      const curInit = Number(sys.attributes.init.value || 0);
+      const baseInit = Number(sys.abilities.agl?.value||0) + Number(sys.abilities.vig?.value||0);
+      if (!curInit && baseInit) sys.attributes.init.value = baseInit;
+    }
+
+    // Apply transferable ActiveEffects from items
+    const allItems = Array.from(items || []);
+    for (const it of allItems){
+      const effects = Array.from(it?.effects || []);
+      for (const ef of effects){
+        if (ef?.disabled) continue;
+        if (ef?.transfer === false) continue;
+        for (const ch of Array.from(ef?.changes || [])){
+          applyChange(sys, ch?.key, ch?.mode, ch?.value);
+        }
+      }
+    }
+
+    // Keep current = max after max-modifying effects (common expectation when exporting a fresh sheet)
+    if (sys.health?.max != null) sys.health.value = sys.health.max;
+    if (sys.focus?.max != null) sys.focus.value = sys.focus.max;
+    if (sys.karma?.max != null && (sys.karma.value == null || Number(sys.karma.value) === 0)) sys.karma.value = sys.karma.max;
+
+    return sys;
+  }
+
   async function ensureAcroFormDA(pdfDoc, sizePt, helv){
     const {PDFName, PDFString, PDFDict, PDFBool} = window.PDFLib;
     const ctx = pdfDoc.context;
@@ -145,8 +246,10 @@
       const helvBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
       await ensureAcroFormDA(pdfDoc, 12, helv);
 
-      const sys = actor?.system || {};
       const items = Array.from(actor?.items ?? []);
+      // In Foundry, derived stats and ActiveEffects are prepared at runtime.
+      // In the static site we compute the relevant derived fields so the PDF matches FVTT.
+      const sys = computePreparedSystem(actor?.system || {}, items);
 
       const name = nvl(sys.codename, actor?.name);
       setText(form, 'Name1', normalizePdfText(name), 17);

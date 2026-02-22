@@ -1,12 +1,12 @@
 /* Multiverse D616 — Charactermancer Site
  * Web port based on the Foundry module: marvel-multiverse-charactermancer v0.1.3
- * Site version: v0.0.9
+ * Site version: v0.0.10
  */
 
 (function(){
   'use strict';
 
-  const SITE_VERSION = '0.0.9';
+  const SITE_VERSION = '0.0.10';
   const ROOT_ID = 'mmc-root';
 
   // ---------- Tiny "Foundry-like" stubs (to keep the original code structure) ----------
@@ -1063,13 +1063,23 @@
       }, 500);
 
       const inputBasic = left.querySelector('input[name="search-powers-basic"]');
+      // Preserve search term across re-renders (so the filter doesn't "stick" with an empty input).
+      try{ inputBasic.value = this.state.search?.powers || ''; }catch(_){ }
       if (this._focus?.['powers-basic']){
         try{ inputBasic.focus(); inputBasic.selectionStart=inputBasic.selectionEnd=inputBasic.value.length; }catch(_){ }
       }
-      inputBasic.addEventListener('input',(ev)=>{ const v=ev.target.value||''; _filterList(listBasic, v); deb(v); });
+      inputBasic.addEventListener('input',(ev)=>{
+        const v=ev.target.value||'';
+        // Update live filter immediately (both lists)
+        _filterList(listBasic, v);
+        _filterList(listSet, v);
+        // Keep state in sync, and re-render after debounce to rebuild the set list properly
+        this.state.search.powers = v;
+        deb(v);
+      });
       inputBasic.addEventListener('keyup',(ev)=>{ try{ this._focus = { ...(this._focus||{}), 'powers-basic': { q: "input[name='search-powers-basic']", pos: (ev.currentTarget.selectionEnd||ev.currentTarget.value.length) } }; }catch(_){ } });
       inputBasic.addEventListener('keydown',(ev)=>{
-        if (ev.key==='Escape'){ ev.preventDefault(); inputBasic.value=''; deb(''); }
+        if (ev.key==='Escape'){ ev.preventDefault(); inputBasic.value=''; this.state.search.powers=''; _filterList(listBasic,''); _filterList(listSet,''); deb(''); }
         if ((ev.ctrlKey||ev.metaKey) && ev.key.toLowerCase()==='f'){ ev.preventDefault(); inputBasic.focus(); inputBasic.select(); }
       });
 

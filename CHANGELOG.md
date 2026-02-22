@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.0.10
+
+- **UI (Passo 5 — Poderes):** o campo **Buscar...** agora **mantém o texto digitado** entre re-renderizações e o filtro não “gruda” com o input vazio.
+- **PDF (M616):** implementada a preparação de dados **no estilo Foundry** (aplicando ActiveEffects dos itens selecionados) para calcular corretamente:
+  - **Defense Score**
+  - **Non-Combat Checks**
+  - **DAMAGE (Multipliers)**
+
 ## v0.0.9
 
 - **UI:** a dica do rodapé agora é a mesma em **todas as telas** (não muda por etapa).
