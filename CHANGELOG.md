@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.0.13
+
+- **JSON (Foundry / Multiverse D616):** corrigida a exportação para garantir que **todos os itens embutidos** (Powers/Traits/Tags concedidos por Origin/Occupation) sejam exportados com o **schema completo** do sistema (campos como `modifiers`, `quantity`, etc.), evitando erro ao abrir a ficha no Foundry (`Cannot read properties of undefined (reading 'push')`).
+
 ## v0.0.12
 
 - **PDF (M616) — DAMAGE:** corrigida a regra do **Multiplicador de Dano** para bater com o sistema **Multiverse D616**: agora o multiplicador base é **igual ao Rank do personagem** e depois recebe os **modificadores** dos itens (ActiveEffects).

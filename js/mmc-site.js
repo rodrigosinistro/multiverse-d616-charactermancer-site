@@ -6,7 +6,7 @@
 (function(){
   'use strict';
 
-  const SITE_VERSION = '0.0.12';
+  const SITE_VERSION = '0.0.13';
   const ROOT_ID = 'mmc-root';
 
   // ---------- Tiny "Foundry-like" stubs (to keep the original code structure) ----------
@@ -1512,6 +1512,87 @@
       for (const [k,v] of Object.entries(this.state.bio||{})) base.system[k] = v;
       base.name = (this.state.bio.codename?.trim()) || (this.state.bio.realname?.trim()) || base.name || 'Herói';
 
+
+      // Ensure the exported document matches Multiverse D616 (prevents sheet crashes)
+      try{
+        if (base?._stats){
+          base._stats.systemId = 'multiverse-d616';
+          if (!base._stats.systemVersion) base._stats.systemVersion = '0.1.51';
+        }
+      }catch(_){}
+
+      // Hydrate stubs (granted powers/traits/tags from origin/occupation) using the canonical datasets,
+      // so every embedded Item has the full system schema expected by the Foundry system.
+      const _mkIndex = (arr)=>{
+        const byId = new Map();
+        const byName = new Map();
+        for (const it of arr||[]){
+          if (!it) continue;
+          if (it._id) byId.set(it._id, it);
+          const nm = String(it.name||'').trim().toLowerCase();
+          if (nm) byName.set(nm, it);
+        }
+        return { byId, byName };
+      };
+      const _idx = {
+        power: _mkIndex(this.state.data.powers),
+        trait: _mkIndex(this.state.data.traits),
+        tag: _mkIndex(this.state.data.tags),
+        occupation: _mkIndex(this.state.data.occupations),
+        origin: _mkIndex(this.state.data.origins)
+      };
+      const _hydrate = (item)=>{
+        const it = deepClone(item ?? {});
+        const type = it.type || it.mmcKind || (it.system?.powerSet ? 'power' : undefined);
+        if (type) it.type = type;
+
+        const idx = type ? _idx[type] : null;
+        if (!idx) return it;
+
+        const nm = String(it.name||'').trim().toLowerCase();
+        const canon = (it._id && idx.byId.get(it._id)) || (nm && idx.byName.get(nm)) || null;
+        if (!canon) return it;
+
+        const merged = deepClone(canon);
+
+        merged.name = it.name ?? merged.name;
+        merged.type = type;
+        merged.system = merged.system || {};
+        if (it.system && typeof it.system === 'object'){
+          for (const [k,v] of Object.entries(it.system)){
+            if (v !== undefined) merged.system[k] = deepClone(v);
+          }
+        }
+
+        // Ensure expected fields exist (system code often assumes these)
+        if (type === 'power'){
+          if (!Array.isArray(merged.system.modifiers)) merged.system.modifiers = [];
+          if (merged.system.quantity === undefined) merged.system.quantity = 1;
+          if (merged.system.ability === undefined) merged.system.ability = '';
+          if (merged.system.attack === undefined) merged.system.attack = false;
+          if (merged.system.formula === undefined) merged.system.formula = '';
+        }
+        if (type === 'trait' || type === 'tag'){
+          if (merged.system.quantity === undefined) merged.system.quantity = 1;
+          if (merged.system.ability === undefined) merged.system.ability = '';
+          if (merged.system.attack === undefined) merged.system.attack = false;
+          if (merged.system.formula === undefined) merged.system.formula = '';
+        }
+        if (!Array.isArray(merged.effects)) merged.effects = [];
+        if (!merged.flags) merged.flags = {};
+
+        // Remove compendium-only keys that can confuse Foundry import
+        delete merged._key;
+        delete merged.uuid;
+        delete merged.pack;
+
+        // Ensure doc-ish keys
+        if (merged.sort === undefined) merged.sort = 0;
+        if (!merged.ownership) merged.ownership = { default: 0 };
+
+        return merged;
+      };
+
       // Items — mimic charactermancer export (include granted on the actor file)
       const items = [];
       if (this.state.occupation) items.push(this.state.occupation);
@@ -1540,10 +1621,8 @@
 
       base.items = [];
       for (const it of items){
-        const kind = it?.type || it?.mmcKind || (it?.system?.powerSet ? 'power' : undefined);
-        const clone = deepClone(it ?? {});
-        if (!clone.type && kind) clone.type = kind;
-        base.items.push(clone);
+        const clone = _hydrate(it);
+        if (clone) base.items.push(clone);
       }
 
       // Effects remain as-is; optional
