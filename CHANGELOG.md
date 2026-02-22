@@ -1,6 +1,14 @@
 # Changelog
 
 
+## v0.0.17
+
+- **Fix (Foundry Import / Power Sets):** corrigido o tratamento de Power Sets com espaço/hífen (ex.: **Animal Control**, **Super-Speed**).
+  - A exportação para Foundry volta a **preservar o label original** em `item.system.powerSet` (ex.: `"Animal Control"`).
+  - O site agora deriva a chave do bucket (`animalControl`, `superSpeed`, etc.) a partir do label e **garante** que `actor.system.powers[<bucket>]` exista como array antes de exportar.
+  - Compatível com exports antigos que vinham sem separadores (ex.: `AnimalControl`).
+
+
 ## v0.0.16
 
 - **Fix (Foundry Import):** corrigida a exportação de **Power Sets com espaço no nome** (ex.: **Animal Control**).

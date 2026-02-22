@@ -1,12 +1,12 @@
 /* Multiverse D616 — Charactermancer Site
  * Web port based on the Foundry module: marvel-multiverse-charactermancer v0.1.3
- * Site version: v0.0.16
+ * Site version: v0.0.17
  */
 
 (function(){
   'use strict';
 
-  const SITE_VERSION = '0.0.16';
+  const SITE_VERSION = '0.0.17';
   const ROOT_ID = 'mmc-root';
 
   // ---------- Tiny "Foundry-like" stubs (to keep the original code structure) ----------
@@ -1642,45 +1642,47 @@
       }
 
       // --- Robust Power Set handling ---
-      // The Multiverse-D616 character sheet groups powers by a derived "power set key".
-      // If a Power Item uses a powerSet that doesn't exist in system.powers, the sheet can crash
-      // ("Cannot read properties of undefined (reading 'push')"). Ensure system.powers has a
-      // bucket for every powerSet present on exported items.
+      // The Multiverse-D616 character sheet groups powers by a derived "power set key" (camelCase).
+      // If a Power Item uses a Power Set that doesn't exist in actor.system.powers, the sheet can crash
+      // ("Cannot read properties of undefined (reading 'push')"). Ensure actor.system.powers has a
+      // bucket for every powerSet present on exported Power items.
       const _canonPowerSetLabel = (s)=>{
-        const raw = String(s||'').replace(/[–—]/g,'-').replace(/\s+/g,' ').trim();
-        if (!raw) return 'Basic';
+        const raw0 = String(s||'').replace(/[–—]/g,'-').replace(/\s+/g,' ').trim();
+        if (!raw0) return 'Basic';
+
+        // If the label already exists in our powers catalog, use that exact label.
         try{
           const all = Array.from(new Set((this.state.data.powers||[]).map(p=>p?.system?.powerSet).filter(Boolean)));
-          const hit = all.find(x=>String(x).trim().toLowerCase() === raw.toLowerCase());
+          const hit = all.find(x=>String(x).replace(/[–—]/g,'-').replace(/\s+/g,' ').trim().toLowerCase() === raw0.toLowerCase());
           if (hit) return hit;
-        }catch(_){ }
-        // Fallback: Title Case each word (helps with user/world power sets)
-        return raw.split(' ').map(w=> w ? (w[0].toUpperCase()+w.slice(1)) : w).join(' ');
+        }catch(_){}
+
+        // Handle older exports that removed separators (e.g. "AnimalControl" -> "Animal Control")
+        if (/^[A-Za-z0-9]+$/.test(raw0) && /[a-z0-9][A-Z]/.test(raw0)){
+          return raw0.replace(/([a-z0-9])([A-Z])/g, '$1 $2');
+        }
+        return raw0;
       };
-      // IMPORTANT (Foundry import stability): the D616 sheet derives the bucket key by
-      // lowercasing the first character of the Power Set string (and otherwise keeping it).
-      // That means multi-word sets like "Animal Control" would derive to "animal Control"
-      // (with a space) and crash the sheet when it does .push on an undefined bucket.
-      // To match the system's expectations, export multi-word sets as PascalCase-without-spaces
-      // (e.g. "AnimalControl"). The bucket key then becomes "animalControl".
-      const _powerSetExportValue = (label)=>{
+
+      // Mirror the system's common powerSet-key derivation: split on spaces/hyphens/underscores and camelCase.
+      // Examples: "Super-Speed" -> "superSpeed", "Melee Weapons" -> "meleeWeapons", "Animal Control" -> "animalControl"
+      const _powerSetKeyFromLabel = (label)=>{
         const clean = String(label||'').replace(/[–—]/g,'-').trim();
-        if (!clean) return 'Basic';
+        if (!clean) return 'basic';
         const parts = clean
-          .replace(/[^A-Za-z0-9\-\s]/g,'')
-          .replace(/\-/g,' ')
+          .replace(/[\-_]+/g,' ')
+          .replace(/[^A-Za-z0-9\s]/g,' ')
           .split(/\s+/)
           .filter(Boolean);
-        if (!parts.length) return 'Basic';
-        return parts.map(p=> p.charAt(0).toUpperCase()+p.slice(1)).join('');
+        if (!parts.length) return 'basic';
+        const first = parts[0].toLowerCase();
+        const rest = parts.slice(1).map(w => w ? (w.charAt(0).toUpperCase() + w.slice(1)) : '').join('');
+        return first + rest;
       };
-      const _powerSetKeyFromExportValue = (exportVal)=>{
-        const v = String(exportVal||'').trim();
-        if (!v) return 'basic';
-        return v.charAt(0).toLowerCase() + v.slice(1);
-      };
+
       try{
         base.system.powers = (base.system.powers && typeof base.system.powers === 'object') ? base.system.powers : {};
+        // Normalize existing buckets
         for (const k of Object.keys(base.system.powers)){
           if (!Array.isArray(base.system.powers[k])) base.system.powers[k] = [];
         }
@@ -1690,14 +1692,12 @@
           if (it?.type !== 'power') continue;
           it.system = it.system || {};
           const label = _canonPowerSetLabel(it.system.powerSet || 'Basic');
-          const exportVal = _powerSetExportValue(label);
-          it.system.powerSet = exportVal;
-          const key = _powerSetKeyFromExportValue(exportVal);
+          it.system.powerSet = label; // IMPORTANT: keep the canonical label (with spaces/hyphens) for Foundry.
+          const key = _powerSetKeyFromLabel(label);
           if (!Array.isArray(base.system.powers[key])) base.system.powers[key] = [];
         }
       }catch(_){ }
-
-      // Effects remain as-is; optional
+// Effects remain as-is; optional
       return base;
     }
 
