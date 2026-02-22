@@ -6,7 +6,7 @@
 (function(){
   'use strict';
 
-  const SITE_VERSION = '0.0.13';
+  const SITE_VERSION = '0.0.14';
   const ROOT_ID = 'mmc-root';
 
   // ---------- Tiny "Foundry-like" stubs (to keep the original code structure) ----------
@@ -1517,7 +1517,13 @@
       try{
         if (base?._stats){
           base._stats.systemId = 'multiverse-d616';
-          if (!base._stats.systemVersion) base._stats.systemVersion = '0.1.51';
+          // Force the correct systemVersion: the base actor-model comes from marvel-multiverse (2.x).
+          // Keeping 2.x here prevents Multiverse-D616 migrations/defaults from running during import.
+          base._stats.systemVersion = '0.1.51';
+          if (base._stats.exportSource){
+            base._stats.exportSource.systemId = 'multiverse-d616';
+            base._stats.exportSource.systemVersion = '0.1.51';
+          }
         }
       }catch(_){}
 
@@ -1581,6 +1587,16 @@
         if (!Array.isArray(merged.effects)) merged.effects = [];
         if (!merged.flags) merged.flags = {};
 
+        // Make item metadata consistent with the target system.
+        // Items coming from the original charactermancer datasets can carry marvel-multiverse stats.
+        // Keeping those can prevent Multiverse-D616 migrations/defaults and may crash the sheet.
+        try{
+          merged._stats = merged._stats || {};
+          merged._stats.systemId = 'multiverse-d616';
+          merged._stats.systemVersion = '0.1.51';
+          delete merged._stats.exportSource;
+        }catch(_){ }
+
         // Remove compendium-only keys that can confuse Foundry import
         delete merged._key;
         delete merged.uuid;
@@ -1624,6 +1640,53 @@
         const clone = _hydrate(it);
         if (clone) base.items.push(clone);
       }
+
+      // --- Robust Power Set handling ---
+      // The Multiverse-D616 character sheet groups powers by a derived "power set key".
+      // If a Power Item uses a powerSet that doesn't exist in system.powers, the sheet can crash
+      // ("Cannot read properties of undefined (reading 'push')"). Ensure system.powers has a
+      // bucket for every powerSet present on exported items.
+      const _canonPowerSetLabel = (s)=>{
+        const raw = String(s||'').replace(/[–—]/g,'-').replace(/\s+/g,' ').trim();
+        if (!raw) return 'Basic';
+        try{
+          const all = Array.from(new Set((this.state.data.powers||[]).map(p=>p?.system?.powerSet).filter(Boolean)));
+          const hit = all.find(x=>String(x).trim().toLowerCase() === raw.toLowerCase());
+          if (hit) return hit;
+        }catch(_){ }
+        // Fallback: Title Case each word (helps with user/world power sets)
+        return raw.split(' ').map(w=> w ? (w[0].toUpperCase()+w.slice(1)) : w).join(' ');
+      };
+      const _powerSetKeyFromLabel = (label)=>{
+        const clean = String(label||'')
+          .replace(/[–—]/g,'-')
+          .trim();
+        if (!clean) return 'basic';
+        const parts = clean
+          .replace(/[^A-Za-z0-9\-\s]/g,'')
+          .replace(/\-/g,' ')
+          .split(/\s+/)
+          .filter(Boolean);
+        if (!parts.length) return 'basic';
+        const [first, ...rest] = parts;
+        return first.toLowerCase() + rest.map(p=>p.charAt(0).toUpperCase()+p.slice(1)).join('');
+      };
+      try{
+        base.system.powers = (base.system.powers && typeof base.system.powers === 'object') ? base.system.powers : {};
+        for (const k of Object.keys(base.system.powers)){
+          if (!Array.isArray(base.system.powers[k])) base.system.powers[k] = [];
+        }
+        if (!Array.isArray(base.system.powers.basic)) base.system.powers.basic = [];
+
+        for (const it of (base.items||[])){
+          if (it?.type !== 'power') continue;
+          it.system = it.system || {};
+          const label = _canonPowerSetLabel(it.system.powerSet || 'Basic');
+          it.system.powerSet = label;
+          const key = _powerSetKeyFromLabel(label);
+          if (!Array.isArray(base.system.powers[key])) base.system.powers[key] = [];
+        }
+      }catch(_){ }
 
       // Effects remain as-is; optional
       return base;

@@ -314,7 +314,7 @@
         "ability": "ego",
         "attack": false,
         "formula": "{1d6,1dm,1d6}",
-        "powerSet": "animal control",
+        "powerSet": "Animal Control",
         "modifiers": [],
         "numbered": 0,
         "attackRange": 0,
@@ -342,9 +342,9 @@
       "_stats": {
         "coreVersion": "13.351",
         "systemId": "multiverse-d616",
-        "systemVersion": "0.1.38",
+        "systemVersion": "0.1.51",
         "createdTime": 1770040797665,
-        "modifiedTime": 1770041069327,
+        "modifiedTime": 1771723771822,
         "lastModifiedBy": "KoOOm4SONUteoNDL"
       },
       "ownership": {
@@ -4878,7 +4878,7 @@
         "ability": "",
         "attack": false,
         "formula": "{1d6,1dm,1d6}",
-        "powerSet": "animal control",
+        "powerSet": "Animal Control",
         "modifiers": [],
         "numbered": 0,
         "attackRange": 0,
@@ -4906,9 +4906,9 @@
       "_stats": {
         "coreVersion": "13.351",
         "systemId": "multiverse-d616",
-        "systemVersion": "0.1.38",
+        "systemVersion": "0.1.51",
         "createdTime": 1770040539951,
-        "modifiedTime": 1770040745415,
+        "modifiedTime": 1771723766297,
         "lastModifiedBy": "KoOOm4SONUteoNDL"
       },
       "ownership": {
@@ -13895,7 +13895,7 @@
         "ability": "",
         "attack": false,
         "formula": "{1d6,1dm,1d6}",
-        "powerSet": "Animal control",
+        "powerSet": "Animal Control",
         "modifiers": [],
         "numbered": 0,
         "attackRange": 0,
@@ -13923,9 +13923,9 @@
       "_stats": {
         "coreVersion": "13.351",
         "systemId": "multiverse-d616",
-        "systemVersion": "0.1.38",
+        "systemVersion": "0.1.51",
         "createdTime": 1770039750032,
-        "modifiedTime": 1770041074459,
+        "modifiedTime": 1771723750259,
         "lastModifiedBy": "KoOOm4SONUteoNDL"
       },
       "ownership": {
@@ -15851,7 +15851,7 @@
         "ability": "",
         "attack": false,
         "formula": "{1d6,1dm,1d6}",
-        "powerSet": "animal control",
+        "powerSet": "Animal Control",
         "modifiers": [],
         "numbered": 0,
         "attackRange": 0,
@@ -15879,9 +15879,9 @@
       "_stats": {
         "coreVersion": "13.351",
         "systemId": "multiverse-d616",
-        "systemVersion": "0.1.38",
+        "systemVersion": "0.1.51",
         "createdTime": 1770040384619,
-        "modifiedTime": 1770040758574,
+        "modifiedTime": 1771723761143,
         "lastModifiedBy": "KoOOm4SONUteoNDL"
       },
       "ownership": {

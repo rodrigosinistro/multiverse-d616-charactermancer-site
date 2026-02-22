@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.0.14
+
+- **JSON (Foundry / Multiverse D616):** corrigida a exportação para evitar crash ao abrir a ficha no Foundry (`Cannot read properties of undefined (reading 'push')`).
+  - `systemVersion` agora é **forçado** para **0.1.51** no Actor exportado (o modelo base vinha do `marvel-multiverse` 2.x e isso impedia migrações/defaults do D616).
+  - Itens exportados agora têm `_stats.systemId = multiverse-d616` e `_stats.systemVersion = 0.1.51` (remove `exportSource`).
+  - Exportação agora garante que `system.powers` contenha um **bucket (array vazio)** para **todo Power Set presente** em itens do tipo `power` (incluindo Power Sets “custom” vindos de JSON importado), prevenindo erro de `.push`.
+
 ## v0.0.13
 
 - **JSON (Foundry / Multiverse D616):** corrigida a exportação para garantir que **todos os itens embutidos** (Powers/Traits/Tags concedidos por Origin/Occupation) sejam exportados com o **schema completo** do sistema (campos como `modifiers`, `quantity`, etc.), evitando erro ao abrir a ficha no Foundry (`Cannot read properties of undefined (reading 'push')`).
