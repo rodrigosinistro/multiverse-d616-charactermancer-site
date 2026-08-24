@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.0.18
+
+- **Secret Wars 2026:** site alinhado ao **Multiverse-D616 v0.1.76**.
+- **Catálogos canônicos:** Origins, Traits, Tags, Powers, Occupations, Items e modelo de Actor agora são carregados diretamente de `rodrigosinistro/multiverse-D616/main/apps/charactermancer/data/`, com os JSONs locais mantidos como fallback.
+- **Origins:** adicionados `Monstrous: Marvel Zombie` e `Weird Science: Power Cosmic`.
+- **Mythic Origins:** `Mythic`, `Mythic: Asgardian` e `Mythic: Olympian` passam a conceder `Allspeak`.
+- **Regras de Origin:** o site passa a respeitar `system.minimumRank`; `Weird Science: Power Cosmic` fica disponível somente em **Rank 5+**.
+- **Traits:** adicionados `From Range`, `Hard to Kill` e `The Hunger`.
+- **Tags:** adicionados `Ageless`, `Allspeak`, `Media Awareness`, `Signature Item` e `Worthy`.
+- **Powers:** adicionados `Iconic Item`, `Power Cosmic`, `Sense Emotion`, `Sway Emotion`, `Control Emotion` e `Control Group Emotion`.
+- **Shield Bearer:** dados de `Hurled Shield Bash`, `Hurled Shield Block`, `Hurled Shield Deflection` e `Rico-Shield` sincronizados com as regras atualizadas do sistema.
+- **Foundry JSON:** Actor e itens embutidos exportados passam a ser normalizados para `_stats.systemId = multiverse-d616` e `_stats.systemVersion = 0.1.76`.
+- **Elemento Plants:** permanece como opção de Elemental Control no sistema; não é um item independente do catálogo web.
 
 ## v0.0.17
 
@@ -7,7 +20,6 @@
   - A exportação para Foundry volta a **preservar o label original** em `item.system.powerSet` (ex.: `"Animal Control"`).
   - O site agora deriva a chave do bucket (`animalControl`, `superSpeed`, etc.) a partir do label e **garante** que `actor.system.powers[<bucket>]` exista como array antes de exportar.
   - Compatível com exports antigos que vinham sem separadores (ex.: `AnimalControl`).
-
 
 ## v0.0.16
 
@@ -35,7 +47,6 @@
 
 - **PDF (M616) — DAMAGE:** corrigida a regra do **Multiplicador de Dano** para bater com o sistema **Multiverse D616**: agora o multiplicador base é **igual ao Rank do personagem** e depois recebe os **modificadores** dos itens (ActiveEffects).
   - Ex.: Rank 3 + Mighty 1 (+1 Melee Multiplier) → **Melee Multiplier = 4**.
-
 
 ## v0.0.11
 
