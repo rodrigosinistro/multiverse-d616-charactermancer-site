@@ -46,6 +46,54 @@
   </div>
 
   <script src="js/m616-export.js"></script>
+  <script>
+    /*
+     * Catálogo sincronizado diretamente com o Charactermancer do sistema.
+     * Isso mantém Origins, Traits, Tags, Powers e demais dados do site alinhados
+     * ao Multiverse-D616 sem duplicar uma segunda base de regras neste repositório.
+     */
+    (() => {
+      const SYSTEM_VERSION = "0.1.76";
+      const SITE_VERSION = "0.0.18";
+      const DATA_ROOT = "https://raw.githubusercontent.com/rodrigosinistro/multiverse-D616/main/apps/charactermancer/data/";
+      const DATA_FILES = new Set([
+        "actor-modelo.json",
+        "items.json",
+        "occupations.json",
+        "origins.json",
+        "traits.json",
+        "tags.json",
+        "powers.json"
+      ]);
+
+      const originalFetch = window.fetch.bind(window);
+      window.fetch = function(resource, options) {
+        try {
+          const raw = typeof resource === "string" ? resource : resource?.url;
+          const url = new URL(raw, window.location.href);
+          const match = url.pathname.match(/(?:^|\/)data\/([^/?#]+)$/);
+          const file = match?.[1];
+          if (file && DATA_FILES.has(file)) {
+            return originalFetch(DATA_ROOT + file, { ...(options || {}), cache: "no-store" });
+          }
+        } catch (_) {}
+        return originalFetch(resource, options);
+      };
+
+      window.MMC_D616_SYNC = Object.freeze({
+        siteVersion: SITE_VERSION,
+        systemVersion: SYSTEM_VERSION,
+        source: "Multiverse-D616 / Secret Wars 2026"
+      });
+
+      window.addEventListener("load", () => {
+        setTimeout(() => {
+          const version = document.getElementById("version");
+          if (version) version.textContent = `v${SITE_VERSION} • D616 v${SYSTEM_VERSION} • Secret Wars 2026`;
+        }, 0);
+      });
+    })();
+  </script>
   <script src="js/mmc-site.js"></script>
 </body>
 </html>
