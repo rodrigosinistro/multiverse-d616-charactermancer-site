@@ -2,75 +2,88 @@
 
 Charactermancer **web (site estático)** para o **Multiverse D616**.
 
-Ele replica o **fluxo** e o **layout** do charactermancer do Foundry (módulo `marvel-multiverse-charactermancer`) e, ao final, permite **exportar a ficha em PDF (M616)** usando a mesma base de templates/lógica do `sheet-export-m616`.
+Ele replica o fluxo do Charactermancer do sistema Foundry e, ao final, permite exportar a ficha em **PDF (M616)** e **JSON compatível com Foundry VTT / Multiverse-D616**.
+
+## Versão atual
+
+- **Site:** v0.0.18
+- **Sistema de referência:** Multiverse-D616 v0.1.76
+- **Conteúdo:** atualizado com as regras e opções de criação relevantes do *Marvel Multiverse Role-Playing Game: Secret Wars Expansion* (2026).
 
 ## Site (GitHub Pages)
 
-- **URL esperada:** `https://rodrigosinistro.github.io/multiverse-d616-charactermancer-site/`
-  - Se você publicar em outro usuário/repositório, a URL muda de acordo.
+- **URL:** `https://rodrigosinistro.github.io/multiverse-d616-charactermancer-site/`
 
 ## Como usar
 
-1. **Rank & Atributos**: escolha o Rank e distribua os atributos (M.A.R.V.E.L.).
-   - Opcional: use **Importar JSON** para carregar um **Actor JSON do Foundry VTT (Multiverse D616)**.
+1. **Rank & Atributos**: escolha o Rank e distribua os atributos M.A.R.V.E.L.
+   - Opcional: use **Importar JSON** para carregar um Actor JSON do Foundry VTT.
 2. **Ocupação** e **Origem**.
 3. **Traços & Tags**.
-   - **Traços bônus**: a quantidade de Traços extras selecionáveis é limitada pelo **Rank** (igual ao charactermancer do Foundry).
-4. **Poderes** (respeitando pré-requisitos e limite do Rank).
-5. **Revisão**: preencha a Biografia e clique em **Baixar PDF (M616)**.
+   - Traços bônus são limitados pelo Rank.
+4. **Poderes**, respeitando pré-requisitos e o limite do Rank.
+5. **Revisão**: preencha a biografia e baixe PDF ou JSON.
 
-## Publicar no GitHub Pages (sem build)
+## Secret Wars 2026
 
-Este projeto é **100% estático**. Para publicar:
+A v0.0.18 sincroniza o site com o Charactermancer do Multiverse-D616 v0.1.76. Entre as adições relevantes para criação de personagem estão:
 
-1. Faça commit/push na branch **`main`**.
-2. No GitHub, vá em **Settings → Pages**.
-3. Em **Build and deployment**:
-   - **Source:** *Deploy from a branch*
-   - **Branch:** `main`
-   - **Folder:** `/ (root)`
-4. Salve. O GitHub Pages servirá o `index.html` diretamente.
+- **Origins:** `Monstrous: Marvel Zombie` e `Weird Science: Power Cosmic`.
+- **Mythic Origins:** passam a conceder `Allspeak`.
+- **Traits:** `From Range`, `Hard to Kill` e `The Hunger`.
+- **Tags:** `Ageless`, `Allspeak`, `Media Awareness`, `Signature Item` e `Worthy`.
+- **Powers:** `Iconic Item`, `Power Cosmic`, `Sense Emotion`, `Sway Emotion`, `Control Emotion` e `Control Group Emotion`.
+- **Shield Bearer:** os dados dos poderes de escudo arremessado acompanham as regras atualizadas do sistema.
+- **Weird Science: Power Cosmic:** a origem respeita o requisito mínimo de **Rank 5** no site.
 
-> Observação: existe um arquivo `.nojekyll` para evitar que o Pages trate o repositório como Jekyll.
+`Plants`, adicionado às opções de Elemental Control no sistema, é um valor de elemento do Power e não um Power/Trait/Tag independente do catálogo do Charactermancer web.
+
+## Sincronização dos catálogos
+
+A partir da v0.0.18, a fonte canônica dos catálogos do site é o próprio repositório do sistema:
+
+`rodrigosinistro/multiverse-D616/main/apps/charactermancer/data/`
+
+O site carrega dali, em tempo de execução:
+
+- `actor-modelo.json`
+- `items.json`
+- `occupations.json`
+- `origins.json`
+- `traits.json`
+- `tags.json`
+- `powers.json`
+
+Isso evita que o site e o sistema mantenham duas bases de regras divergentes. Os arquivos da pasta local `data/` continuam no repositório como **fallback** caso a fonte remota esteja temporariamente indisponível.
 
 ## PDF (M616)
 
-- **Templates embutidos:** `assets/templates/` (os PDFs-base ficam no repositório — não apontam para fora).
-- **Libs via CDN:** atualmente o export usa `pdf-lib` e `FileSaver` via CDN (carregamento no navegador).
-- **Campos editáveis:** a **página principal** é gerada mantendo os **campos do template editáveis** (não é *flatten*).
-- **Páginas extras (descrições):** são renderizadas como texto e usam **1 coluna**.
-
-> Observação: o preenchimento de Traços/Tags/Poderes segue o mesmo mapeamento de campos do módulo `sheet-export-m616`.
+- Templates em `assets/templates/`.
+- Export via `pdf-lib` e `FileSaver`.
+- A página principal mantém os campos editáveis.
+- Páginas extras de descrições são renderizadas em uma coluna.
 
 ## JSON (Foundry VTT — Multiverse D616)
 
-- **Importar JSON (Passo 1):** aceita o **JSON de Actor exportado pelo Foundry VTT** usando o sistema **Multiverse D616**.
-- **Baixar JSON (Passo 6):** gera um **Actor JSON compatível** para você importar no Foundry (**Multiverse D616**).
-
-> Nota: para evitar crash do sheet ao importar quando existir um Power Set novo (ex.: **Animal Control**), o site **preserva o label** em `item.system.powerSet` (ex.: `"Animal Control"`) e **garante** que `actor.system.powers` tenha o bucket correspondente (ex.: `animalControl`) antes de exportar.
-
-> Dica: se você exportar um personagem do Foundry (Actor → Export Data) e importar aqui, o site tenta mapear automaticamente Rank, Atributos, Bio, Ocupação/Origem, Traços/Tags e Poderes.
+- **Importar JSON:** aceita Actor JSON exportado pelo Foundry usando Multiverse-D616.
+- **Baixar JSON:** gera Actor JSON para importação no Foundry.
+- A v0.0.18 normaliza `_stats.systemId` para `multiverse-d616` e `_stats.systemVersion` para **0.1.76** no Actor e em seus itens embutidos.
+- Power Sets mantêm seus labels canônicos e o site garante os buckets correspondentes em `actor.system.powers`.
 
 ## Estrutura do projeto
 
-- `index.html` — app (SPA simples)
-- `styles/` — CSS do charactermancer
-- `data/` — JSONs (ocupações, origens, traços, tags, poderes, modelo do ator)
-- `assets/templates/` — templates do PDF (cores)
-- `js/mmc-site.js` — charactermancer (web port)
-- `js/m616-export.js` — exportação de PDF (web port)
+- `index.html` — app estático e sincronização dos catálogos.
+- `styles/` — estilos.
+- `data/` — fallback local dos catálogos.
+- `assets/templates/` — templates do PDF.
+- `js/mmc-site.js` — Charactermancer web.
+- `js/m616-export.js` — exportador PDF.
+- `js/secret-wars-2026.js` — compatibilidade Secret Wars 2026, requisito mínimo de Origins e normalização da versão dos JSONs exportados.
 
-## Atualizar os catálogos (dados do Foundry)
+## Publicar no GitHub Pages
 
-Se você atualizar os compêndios no Foundry, basta substituir os arquivos JSON em `data/` (por exemplo `powers.json`, `traits.json`, `tags.json`, `occupations.json`, `origins.json` e `items.json`) por novas exportações.
-
-> Importante: os templates de PDF devem permanecer em `assets/templates/` e não podem apontar para fora.
+O projeto não precisa de build. O GitHub Pages deve usar a branch `main`, pasta `/ (root)`. O arquivo `.nojekyll` impede processamento por Jekyll.
 
 ## Como reportar bugs
 
-Abra uma **Issue** no GitHub com:
-
-1. **Passo a passo** para reproduzir.
-2. **Print** (ou vídeo curto) do que aconteceu.
-3. Se possível, anexe um **JSON exportado** (do Foundry ou do site) para reproduzir o estado.
-4. Informe navegador e sistema (ex.: Chrome/Edge + Windows).
+Abra uma Issue no GitHub contendo o passo a passo, print ou vídeo, navegador/sistema e, se possível, o JSON usado para reproduzir o problema.
