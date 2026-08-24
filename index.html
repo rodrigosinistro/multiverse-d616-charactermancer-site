@@ -48,9 +48,9 @@
   <script src="js/m616-export.js"></script>
   <script>
     /*
-     * Catálogo sincronizado diretamente com o Charactermancer do sistema.
-     * Isso mantém Origins, Traits, Tags, Powers e demais dados do site alinhados
-     * ao Multiverse-D616 sem duplicar uma segunda base de regras neste repositório.
+     * O repositório do sistema é a fonte canônica dos catálogos do Charactermancer.
+     * O site busca primeiro os dados do Multiverse-D616 e mantém os JSONs locais
+     * como fallback caso o raw.githubusercontent.com esteja indisponível.
      */
     (() => {
       const SYSTEM_VERSION = "0.1.76";
@@ -67,16 +67,24 @@
       ]);
 
       const originalFetch = window.fetch.bind(window);
-      window.fetch = function(resource, options) {
+      window.fetch = async function(resource, options) {
         try {
           const raw = typeof resource === "string" ? resource : resource?.url;
           const url = new URL(raw, window.location.href);
           const match = url.pathname.match(/(?:^|\/)data\/([^/?#]+)$/);
           const file = match?.[1];
+
           if (file && DATA_FILES.has(file)) {
-            return originalFetch(DATA_ROOT + file, { ...(options || {}), cache: "no-store" });
+            try {
+              const remote = await originalFetch(DATA_ROOT + file, { ...(options || {}), cache: "no-store" });
+              if (remote.ok) return remote;
+              console.warn(`MMC: catálogo remoto ${file} retornou ${remote.status}; usando fallback local.`);
+            } catch (error) {
+              console.warn(`MMC: catálogo remoto ${file} indisponível; usando fallback local.`, error);
+            }
           }
         } catch (_) {}
+
         return originalFetch(resource, options);
       };
 
@@ -85,15 +93,9 @@
         systemVersion: SYSTEM_VERSION,
         source: "Multiverse-D616 / Secret Wars 2026"
       });
-
-      window.addEventListener("load", () => {
-        setTimeout(() => {
-          const version = document.getElementById("version");
-          if (version) version.textContent = `v${SITE_VERSION} • D616 v${SYSTEM_VERSION} • Secret Wars 2026`;
-        }, 0);
-      });
     })();
   </script>
   <script src="js/mmc-site.js"></script>
+  <script src="js/secret-wars-2026.js"></script>
 </body>
 </html>
