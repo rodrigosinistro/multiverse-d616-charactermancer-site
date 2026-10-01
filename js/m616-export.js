@@ -7,7 +7,7 @@
   'use strict';
 
   const M616 = {
-    VERSION: '0.3.54-web',
+    VERSION: '0.3.55-web',
     TEMPLATES: {
       red:   'assets/templates/M616 Character Sheet - Alt Red.pdf',
       black: 'assets/templates/M616 Character Sheet - Alt Black.pdf',
@@ -76,7 +76,7 @@
     if (!path) return;
     const cur = get(root, path);
     const v = parseEffectValue(value);
-    // Foundry modes: 1 MULTIPLY, 2 ADD, 5 OVERRIDE
+    // Foundry modes: 0 CUSTOM, 1 MULTIPLY, 2 ADD, 3 DOWNGRADE, 4 UPGRADE, 5 OVERRIDE
     if (mode === 2){
       const a = Number(cur)||0;
       const b = (typeof v === 'number') ? v : Number(v)||0;
@@ -85,6 +85,15 @@
       const a = Number(cur)||0;
       const b = (typeof v === 'number') ? v : Number(v)||1;
       setByPath(root, path, a * b);
+    } else if (mode === 3 || mode === 4){
+      // Sturdy / Uncanny use UPGRADE (mode 4) in Multiverse-D616.
+      // Match Foundry's behavior: DOWNGRADE keeps the lower value, UPGRADE the higher.
+      const a = Number(cur);
+      const b = (typeof v === 'number') ? v : Number(v);
+      if (Number.isFinite(b)){
+        const current = Number.isFinite(a) ? a : 0;
+        setByPath(root, path, mode === 4 ? Math.max(current, b) : Math.min(current, b));
+      }
     } else if (mode === 5 || mode === 0){
       setByPath(root, path, v);
     }
