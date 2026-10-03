@@ -6,10 +6,16 @@ Ele replica o fluxo do Charactermancer do sistema Foundry e, ao final, permite e
 
 ## Versão atual
 
-- **Site:** v0.0.18
+- **Site:** v0.0.19
 - **Sistema de referência:** Multiverse-D616 v0.1.76
 - **Conteúdo:** atualizado com as regras e opções de criação relevantes do *Marvel Multiverse Role-Playing Game: Secret Wars Expansion* (2026).
 
+## Novidade v0.0.19
+
+- No passo **Poderes**, cada Power agora possui um ícone circular **i** ao lado do nome.
+- Ao clicar no ícone, o site abre um popup com o conteúdo de **Efeito (`system.effect`)**.
+- O conteúdo é exibido com a formatação HTML correta (parágrafos, negrito, itálico, listas e links), sem mostrar as tags de marcação.
+- O popup pode ser fechado pelo **×**, clicando fora dele ou pressionando **Esc**.
 ## Site (GitHub Pages)
 
 - **URL:** `https://rodrigosinistro.github.io/multiverse-d616-charactermancer-site/`
