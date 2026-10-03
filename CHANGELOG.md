@@ -6,6 +6,7 @@
 - **Popup de Efeito:** clicar no ícone abre um popup com o conteúdo de `system.effect` do Power.
 - **Rich text:** o Efeito é renderizado com sua formatação HTML (parágrafos, negrito, itálico, listas, links etc.), sem exibir as tags como texto.
 - **Usabilidade:** o popup pode ser fechado pelo botão **×**, clicando fora ou pressionando **Esc**.
+
 ## v0.0.18
 
 - **Secret Wars 2026:** site alinhado ao **Multiverse-D616 v0.1.76**.
