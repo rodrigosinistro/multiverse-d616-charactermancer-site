@@ -8,6 +8,7 @@
 - **Importação/Exportação Foundry:** repetições são preservadas no JSON; itens embutidos repetidos recebem `_id` único para evitar conflito no Foundry VTT.
 - **PDF:** Traços/Tags repetidos aparecem com quantidade (ex.: `Linguist ×2`) sem duplicar as páginas de descrição.
 - **Revisão:** repetições também são exibidas com contador para facilitar a conferência.
+- **Cabeçalho:** corrigida a versão exibida para **v0.0.20** e sincronizado o sistema com **D616 v0.1.92**.
 
 ## v0.0.19
 
