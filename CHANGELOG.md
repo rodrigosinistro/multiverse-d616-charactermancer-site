@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.0.20
+
+- **Traços & Tags múltiplos:** o Charactermancer agora respeita `system.multiple = true` dos catálogos.
+- **Seleção repetida:** itens múltiplos continuam com o botão disponível e podem ser selecionados várias vezes; itens comuns permanecem com seleção única.
+- **Remoção correta:** o botão **×** remove somente uma ocorrência do Traço/Tag repetido.
+- **Importação/Exportação Foundry:** repetições são preservadas no JSON; itens embutidos repetidos recebem `_id` único para evitar conflito no Foundry VTT.
+- **PDF:** Traços/Tags repetidos aparecem com quantidade (ex.: `Linguist ×2`) sem duplicar as páginas de descrição.
+- **Revisão:** repetições também são exibidas com contador para facilitar a conferência.
+
 ## v0.0.19
 
 - **UI (Passo 5 — Poderes):** adicionado um ícone circular **i** ao lado do nome de cada Power.

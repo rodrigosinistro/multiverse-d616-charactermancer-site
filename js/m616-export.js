@@ -229,8 +229,23 @@
   function collectLong(actor){
     const items = Array.from(actor?.items ?? []);
     const uniq = arr => Array.from(new Set(arr.map(s => String(s||'').trim()).filter(Boolean)));
-    const traits = uniq(items.filter(i=>i.type==='trait').map(i=>i.name));
-    const tags   = uniq(items.filter(i=>i.type==='tag').map(i=>i.name));
+    const counted = arr => {
+      const order = [];
+      const counts = new Map();
+      for (const raw of arr){
+        const name = String(raw||'').trim();
+        if (!name) continue;
+        const key = name.toLowerCase();
+        if (!counts.has(key)) order.push({key, name});
+        counts.set(key, (counts.get(key)||0) + 1);
+      }
+      return order.map(({key, name}) => {
+        const count = counts.get(key) || 0;
+        return count > 1 ? `${name} ×${count}` : name;
+      });
+    };
+    const traits = counted(items.filter(i=>i.type==='trait').map(i=>i.name));
+    const tags   = counted(items.filter(i=>i.type==='tag').map(i=>i.name));
     const powers = uniq(items.filter(i=>i.type==='power').map(i=>i.name));
     const perCol = Math.ceil(powers.length/3) || 0;
     const cols = [powers.slice(0,perCol), powers.slice(perCol,2*perCol), powers.slice(2*perCol)];
@@ -392,8 +407,17 @@
           prereq: cleanText(p.system?.prereq || p.system?.prerequisites || ''),
         })).filter(p=>p.name);
 
-        const traits = items.filter(i=>i.type==='trait').map(t => ({ name:t.name, desc: cleanText(t.system?.description || '') })).filter(t=>t.name);
-        const tags = items.filter(i=>i.type==='tag').map(t => ({ name:t.name, desc: cleanText(t.system?.description || '') })).filter(t=>t.name);
+        const uniqueItemsByName = (list)=>{
+          const seen = new Set();
+          return (list||[]).filter(it=>{
+            const key = String(it?.name||'').toLowerCase().trim();
+            if (!key || seen.has(key)) return false;
+            seen.add(key);
+            return true;
+          });
+        };
+        const traits = uniqueItemsByName(items.filter(i=>i.type==='trait')).map(t => ({ name:t.name, desc: cleanText(t.system?.description || '') })).filter(t=>t.name);
+        const tags = uniqueItemsByName(items.filter(i=>i.type==='tag')).map(t => ({ name:t.name, desc: cleanText(t.system?.description || '') })).filter(t=>t.name);
 
         // Only add pages if there is meaningful text
         const hasAnyDetails = powers.some(p=>p.effect||p.powerSet||p.action||p.cost||p.prereq) || traits.some(t=>t.desc) || tags.some(t=>t.desc);
