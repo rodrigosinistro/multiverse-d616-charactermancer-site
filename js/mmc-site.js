@@ -376,80 +376,97 @@
 
     // ---------- prereq parsing (as-is, but without Foundry deps) ----------
     _meetsAllPrereqs(preText, state, ctx={}){
-      try{
-        if (!preText || !String(preText).trim()) return {ok:true, missing:[]};
-        const text = String(preText).toLowerCase().replace(/^pré:\s*/,'').trim();
+      try {
+        const source = String(preText || '').replace(/^(?:pré|pre)\s*:\s*/i, '').trim();
+        if (!source || /^none$/i.test(source)) return {ok:true, missing:[]};
+        const normalize = value => String(value || '').normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '').trim().toLowerCase().replace(/\s+/g, ' ');
         const missing = [];
-
-        const rankMatch = text.match(/rank\s*(\d+)/i);
-        if (rankMatch){
-          const need = parseInt(rankMatch[1]||'0');
-          if ((state.rank||1) < need) missing.push(`Rank ${need}`);
-        }
-
-        const abilityMap = {
-          melee: 'mle', mle:'mle',
-          agility:'agl', agl:'agl',
-          resilience:'res', res:'res',
-          vigilance:'vig', vig:'vig',
-          ego:'ego',
-          logic:'log', log:'log'
-        };
-        const abilityRe = /(melee|mle|agility|agl|resilience|res|vigilance|vig|ego|logic|log)\s*(\d+)/gi;
-        let m;
-        while ((m = abilityRe.exec(text))){
-          const key = abilityMap[m[1].toLowerCase()];
-          const need = parseInt(m[2]||'0');
-          const cur = Number(state.abilities?.[key] ?? 0);
-          if (cur < need) missing.push(`${m[1]} ${need}`);
-        }
-
-        // Powers / Traits / Tags required by name
-        const reqPowerNames = [];
-        const powerRe = /(power|poder)\s*:\s*([^;]+)/gi;
-        while ((m = powerRe.exec(text))){
-          const names = String(m[2]||'').split(',').map(s=>s.trim()).filter(Boolean);
-          reqPowerNames.push(...names);
-        }
-
-        // Also handle simple patterns like "Jump 2" or "Wall-Crawling" if present in prereq text.
-        // The original module checks by scanning known names.
-        const allP = ctx.allP || [];
-        const chosen = ctx.chosen || state.chosenPowers || [];
-        const grantedNameSet = ctx.grantedNameSet || new Set();
-        const grantedIdSet = ctx.grantedIdSet || new Set();
-        const chosenNameSet = new Set((chosen||[]).map(p=>String(p?.name||'').toLowerCase()));
-
-        // Build a lookup of known power names for free-form prereqs
-        const knownPowerNames = new Set((allP||[]).map(p=>String(p?.name||'').toLowerCase()).filter(Boolean));
-
-        const hasPowerName = (nm)=>{
-          const k = String(nm||'').toLowerCase();
-          if (!k) return true;
-          if (chosenNameSet.has(k)) return true;
-          if (grantedNameSet.has(k)) return true;
-          // If we have ids, consider them too
-          for (const p of chosen){ if (p?._id && grantedIdSet.has(p._id)) return true; }
-          return false;
-        };
-
-        for (const nm of reqPowerNames){ if (!hasPowerName(nm)) missing.push(nm); }
-
-        // Heuristic: if prereq contains the name of a known power, require it.
-        // (Keeps behavior close to the original module.)
-        const tokens = String(text).split(/[^a-z0-9\-\s]+/i).join(' ');
-        const tLower = tokens.toLowerCase();
-        for (const nm of knownPowerNames){
-          if (nm.length < 4) continue;
-          if (tLower.includes(nm.toLowerCase())){
-            if (!hasPowerName(nm)) missing.push(nm);
+        const powers = [...(state.data?.powers || []), ...(ctx.allP || [])];
+        const powerNames = new Map(powers.filter(p=>p?.name).map(p=>[normalize(p.name), p.name]));
+        const tags = (state.data?.tags || []).map(t=>normalize(t?.name));
+        const traits = (state.data?.traits || []).map(t=>normalize(t?.name));
+        const tagCatalog = new Set(tags);
+        const traitCatalog = new Set(traits);
+        const granted = new Set(Array.from(ctx.grantedNameSet || []).map(normalize));
+        const chosen = state.chosenPowers || ctx.chosen || [];
+        const chosenNames = new Set(chosen.map(p=>normalize(p?.name)));
+        const grantedIds = ctx.grantedIdSet || new Set();
+        for (const p of chosen) {
+          if (p?._id) {
+            const canonical = powers.find(x=>x?._id === p._id);
+            if (canonical) chosenNames.add(normalize(canonical.name));
           }
         }
-
-        return { ok: missing.length===0, missing };
-      }catch(e){
-        console.warn('MMC prereq parse failed', e);
-        return { ok:true, missing:[] };
+        for (const p of powers) {
+          if (p?._id && grantedIds.has(p._id)) granted.add(normalize(p.name));
+        }
+        const hasPower = name=>chosenNames.has(normalize(name)) || granted.has(normalize(name));
+        const traitNames = new Set([...(state.selectedTraits || []),
+          ...(state.occupation?.system?.traits || []), ...(state.origin?.system?.traits || [])]
+          .map(t=>normalize(t?.name)));
+        const tagNames = new Set([...(state.selectedTags || []),
+          ...(state.occupation?.system?.tags || []), ...(state.origin?.system?.tags || [])]
+          .map(t=>normalize(t?.name)));
+        const abilities = {melee:'mle',mle:'mle',agility:'agl',agl:'agl',
+          resilience:'res',res:'res',vigilance:'vig',vig:'vig',ego:'ego',logic:'log',log:'log'};
+    
+        // "Grow 2 or Shrink 2" é alternativa: basta um dos dois poderes.
+        const parts = source.replace(/\.\s+(?=[A-Za-z])/g, ', ').split(/[,;]/)
+          .map(part=>part.trim()).filter(Boolean);
+        for (const original of parts) {
+          const part = original.replace(/^(?:power|poder)\s*:\s*/i, '').trim();
+          if (/^(?:none|nenhum)$/i.test(part)) continue;
+          const rank = part.match(/^rank\s*(\d+)$/i);
+          if (rank) {
+            if (Number(state.rank || 1) < Number(rank[1])) missing.push('Rank ' + rank[1]);
+            continue;
+          }
+          const ability = part.match(/^(melee|mle|agility|agl|resilience|res|vigilance|vig|ego|logic|log)\s*(\d+)\+?$/i);
+          if (ability) {
+            const key = abilities[ability[1].toLowerCase()];
+            const value = state.abilities?.[key];
+            const current = Number(value?.value ?? value ?? 0);
+            if (current < Number(ability[2])) missing.push(ability[1] + ' ' + ability[2]);
+            continue;
+          }
+          const trait = part.match(/^(?:trait|traits|traco|tracos|traço|traços)\s*:\s*(.+)$/i);
+          if (trait) {
+            if (!traitNames.has(normalize(trait[1]))) missing.push('Traço: ' + trait[1]);
+            continue;
+          }
+          const tag = part.match(/^tags?\s*:\s*(.+)$/i);
+          if (tag) {
+            if (!tagNames.has(normalize(tag[1]))) missing.push('Tag: ' + tag[1]);
+            continue;
+          }
+          const origin = part.match(/^(.+?)\s+origin$/i);
+          if (origin) {
+            if (normalize(state.origin?.name) !== normalize(origin[1])) missing.push('Origem: ' + origin[1]);
+            continue;
+          }
+          const alternatives = part.split(/\s+(?:or|ou)\s+/i).map(s=>s.trim()).filter(Boolean);
+          if (alternatives.length > 1) {
+            const unknown = alternatives.filter(name=>!powerNames.has(normalize(name)));
+            if (unknown.length) missing.push('Pré-requisito não reconhecido: ' + unknown.join(' / '));
+            else if (!alternatives.some(hasPower)) missing.push('Um de: ' + alternatives.join(' ou '));
+            continue;
+          }
+          if (powerNames.has(normalize(part))) {
+            if (!hasPower(part)) missing.push('Poder: ' + powerNames.get(normalize(part)));
+          } else if (tagCatalog.has(normalize(part))) {
+            if (!tagNames.has(normalize(part))) missing.push('Tag: ' + part);
+          } else if (traitCatalog.has(normalize(part))) {
+            if (!traitNames.has(normalize(part))) missing.push('Traço: ' + part);
+          } else {
+            // Desconhecido deve bloquear, nunca ignorar um pré-requisito digitado errado.
+            missing.push('Pré-requisito não reconhecido: ' + part);
+          }
+        }
+        return {ok:missing.length === 0, missing:[...new Set(missing)]};
+      } catch(error) {
+        console.warn('MMC | Erro ao validar pré-requisitos', error);
+        return {ok:false, missing:['Falha na validação dos pré-requisitos']};
       }
     }
 
@@ -1143,7 +1160,7 @@
         else if (reqRank && (Number(this.state.rank||1) < reqRank)) actionHTML = `<button class="mmc-btn" disabled title="Requer Rank ${reqRank}">Rank ${reqRank}</button>`;
         else if ( (this.state.chosenPowers||[]).length >= Math.max(0, limit - (originConsume?.length||0)) ) actionHTML = `<button class="mmc-btn" disabled title="Limite atingido">Limite</button>`;
         else {
-          const result = this._meetsAllPrereqs(pre, this.state, { allP, grantedNameSet, grantedIdSet, chosen: this.state.chosenPowers });
+          const result = this._meetsAllPrereqs(pre, this.state, { allP: this.state.data.powers || [], grantedNameSet, grantedIdSet, chosen: this.state.chosenPowers });
           if (!result.ok){
             const tt = (result.missing&&result.missing.length) ? ` title="Falta: ${result.missing.join(', ')}"` : '';
             actionHTML = `<button class="mmc-btn" disabled${tt}>Bloqueado</button>`;
@@ -1251,6 +1268,16 @@
         const id = ev.currentTarget.dataset.addPower;
         const p = (this.state.data.powers||[]).find(x=>x._id===id);
         if (!p) return;
+        // Recheck at click time in case state changed since the button was drawn.
+        const check = this._meetsAllPrereqs(p.system?.prerequisites, this.state, {
+          allP: this.state.data.powers || [],
+          chosen: this.state.chosenPowers,
+          grantedNameSet, grantedIdSet
+        });
+        if (!check.ok) {
+          ui.notifications.warn('Pré-requisito ausente: ' + check.missing.join(', '));
+          return;
+        }
 
         if ((this.state.rank||1)===1){
           const chosenSets = new Set((this.state.chosenPowers||[]).map(x=>x.system?.powerSet ?? 'Basic').filter(s=>s!=='Basic'));
