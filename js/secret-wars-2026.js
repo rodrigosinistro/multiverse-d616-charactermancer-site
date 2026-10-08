@@ -1,12 +1,13 @@
 /* Multiverse D616 — Charactermancer Site
  * Secret Wars 2026 compatibility layer
- * Site v0.0.20 / Multiverse-D616 v0.1.92
+ * Site versions synchronized with index.html (MMC_D616_SYNC)
  */
 (function(){
   'use strict';
 
-  const SITE_VERSION = '0.0.20';
-  const SYSTEM_VERSION = '0.1.92';
+  // Single source of truth: the metadata initialized by index.html.
+  const SITE_VERSION = window.MMC_D616_SYNC?.siteVersion || '0.0.21';
+  const SYSTEM_VERSION = window.MMC_D616_SYNC?.systemVersion || '0.1.95';
 
   function stampSystemVersion(document){
     if (!document || typeof document !== 'object') return document;
