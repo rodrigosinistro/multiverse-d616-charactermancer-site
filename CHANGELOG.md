@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.0.21
+
+- **Pré-requisitos dos poderes:** sincronização dos 25 cadastros corrigidos com o Multiverse D616 (nomes, Rank e pontuação).
+- **Return Fire:** requisito corrigido para `Suppressive Fire, Rank 2`.
+- **Poderes distintos:** corrigidas as entradas `Mirror Images`, `Venom Burst` e `Steal Power`, antes confundidas com outros nomes no mesmo Power Set.
+- **Resize Object/Other:** seleção aceita `Grow 2` **ou** `Shrink 2`, respeitando Rank 3.
+- **Validação rígida:** dependências inexistentes ou com grafia incorreta não são mais ignoradas; também verifica Tags, Traços e Origem.
+- **Segurança na seleção:** pré-requisitos reavaliados no momento do clique; a busca não interfere mais na lista usada pela validação.
+- **Cabeçalho:** versão do site atualizada para `v0.0.21`, com versão de referência `D616 v0.1.95`.
+- **Cache:** adicionada versão à URL do JavaScript principal para facilitar a atualização do navegador.
+
 ## v0.0.20
 
 - **Traços & Tags múltiplos:** o Charactermancer agora respeita `system.multiple = true` dos catálogos.
