@@ -1,12 +1,12 @@
 /* Multiverse D616 — Charactermancer Site
  * Web port based on the Foundry module: marvel-multiverse-charactermancer v0.1.3
- * Site version: v0.0.20
+ * Site version: v0.0.21
  */
 
 (function(){
   'use strict';
 
-  const SITE_VERSION = '0.0.20';
+  const SITE_VERSION = '0.0.21';
   const ROOT_ID = 'mmc-root';
 
   // ---------- Tiny "Foundry-like" stubs (to keep the original code structure) ----------
