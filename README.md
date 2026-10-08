@@ -6,9 +6,19 @@ Ele replica o fluxo do Charactermancer do sistema Foundry e, ao final, permite e
 
 ## Versão atual
 
-- **Site:** v0.0.19
-- **Sistema de referência:** Multiverse-D616 v0.1.76
+- **Site:** v0.0.21
+- **Sistema de referência:** Multiverse-D616 v0.1.95
 - **Conteúdo:** atualizado com as regras e opções de criação relevantes do *Marvel Multiverse Role-Playing Game: Secret Wars Expansion* (2026).
+
+## Novidade v0.0.21
+
+- Catálogo de poderes e respectivos pré-requisitos corrigidos e sincronizados com o repositório principal D616.
+- Correções: `Return Fire` requer `Suppressive Fire, Rank 2`; `Always Ready` requer `Do This All Day, Rank 3`.
+- Entradas com nomes próprios corrigidos: `Mirror Images`, `Venom Burst`, `Steal Power`, `Extend Invisibility`.
+- Validação exata de Rank, poderes, Tags, Traços e Origem; pré-requisitos desconhecidos bloqueiam a seleção.
+- Pré-requisitos alternativos (`Grow 2 or Shrink 2`) são aceitos quando **uma** das opções é selecionada.
+- A referência de poderes para a validação é sempre o catálogo inteiro, independentemente da busca da interface.
+- Atualização da versão do site e do JavaScript para `v0.0.21`.
 
 ## Novidade v0.0.19
 
