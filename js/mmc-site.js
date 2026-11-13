@@ -1,13 +1,25 @@
 /* Multiverse D616 — Charactermancer Site
  * Web port based on the Foundry module: marvel-multiverse-charactermancer v0.1.3
- * Site version: v0.0.21
+ * Site version: v0.0.22
  */
 
 (function(){
   'use strict';
 
-  const SITE_VERSION = '0.0.21';
+  const SITE_VERSION = '0.0.22';
   const ROOT_ID = 'mmc-root';
+
+  // Keep the audited requirements even when the remote catalog predates D616 v0.2.165.
+  // Include the Power Set so both versions of Do This All Day are covered explicitly.
+  const POWER_PREREQUISITE_CORRECTIONS = Object.freeze({
+    'energy absorption::basic': 'Rank 4',
+    'blazing fast fists::super-speed': 'Rank 2',
+    'grow 2::resize': 'Grow 1',
+    'do this all day::martial arts': 'Rank 2',
+    'do this all day::shield bearer': 'Rank 2',
+    'speed run 2::super-speed': 'Speed Run 1, Rank 3',
+    'return fire::ranged weapons': 'Suppressive Fire, Rank 2'
+  });
 
   // ---------- Tiny "Foundry-like" stubs (to keep the original code structure) ----------
   const deepClone = (obj)=> {
@@ -269,11 +281,19 @@
       this.state.data.tags = tags.items ?? [];
       this.state.data.powers = powers.items ?? [];
 
-      // Normalize powerSet labels
+      // Normalize labels and apply the audited requirements to remote and local data.
       try{
         const canon = s => String(s||"").replace(/[–—]/g,"-").replace(/\s+/g," ").trim();
         this.state.data.powers = (this.state.data.powers||[]).map(p=>{
-          try{ if (p?.system) p.system.powerSet = canon(p.system.powerSet); }catch(_){ }
+          try{
+            if (p?.system) {
+              p.system.powerSet = canon(p.system.powerSet);
+              const key = `${canon(p.name).toLowerCase()}::${p.system.powerSet.toLowerCase()}`;
+              if (Object.prototype.hasOwnProperty.call(POWER_PREREQUISITE_CORRECTIONS, key)) {
+                p.system.prerequisites = POWER_PREREQUISITE_CORRECTIONS[key];
+              }
+            }
+          }catch(_){ }
           return p;
         });
       }catch(_){ }

@@ -6,7 +6,7 @@
   'use strict';
 
   // Single source of truth: the metadata initialized by index.html.
-  const SITE_VERSION = window.MMC_D616_SYNC?.siteVersion || '0.0.21';
+  const SITE_VERSION = window.MMC_D616_SYNC?.siteVersion || '0.0.22';
   const SYSTEM_VERSION = window.MMC_D616_SYNC?.systemVersion || '0.1.95';
 
   function stampSystemVersion(document){

@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.0.22 — 2026-11-13
+
+- **Energy Absorption:** exige `Rank 4`.
+- **Blazing Fast Fists:** exige `Rank 2`.
+- **Grow 2:** exige `Grow 1`.
+- **Do This All Day:** exige `Rank 2` nas versões Martial Arts e Shield Bearer.
+- **Speed Run 2:** exige `Speed Run 1, Rank 3` também no catálogo local de fallback.
+- **Return Fire:** mantido `Suppressive Fire, Rank 2`, inclusive ao carregar uma fonte antiga com Rank 8.
+- **Catálogos remoto e local:** aplicadas as sete correções auditadas no Multiverse-D616 v0.2.165 antes da seleção de poderes; os demais cadastros permanecem intactos.
+- **Cache:** versão do site e URLs dos scripts atualizadas para `v0.0.22`.
+
 ## v0.0.21
 
 - **Pré-requisitos dos poderes:** sincronização dos 25 cadastros corrigidos com o Multiverse D616 (nomes, Rank e pontuação).
